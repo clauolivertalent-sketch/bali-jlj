@@ -2,7 +2,7 @@
 // Fa servir Netlify Blobs: gratuït i no cal configurar res.
 import { getStore } from "@netlify/blobs";
 
-const KEYS = ["vols", "allotjament", "asseguranca", "despeses", "checklist", "recos", "config"];
+const KEYS = ["vols", "allotjament", "asseguranca", "despeses", "checklist", "recos", "plans", "config"];
 
 function applyOp(cur, op) {
   if (op.op === "set") return op.value;

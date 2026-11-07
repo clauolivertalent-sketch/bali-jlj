@@ -8,7 +8,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,800;1,9..144,500;1,9..144,700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <style>
 :root{
   --jungle:#0c3528; --deep:#12503a; --palm:#1d7a50; --leaf:#46a876; --mint:#bfe5c8;
@@ -83,20 +82,57 @@ section.card{background:var(--white);border:1px solid var(--line);border-radius:
 .chip{border:1px solid var(--line);background:var(--white);padding:6px 14px;border-radius:99px;font-size:13px;font-weight:500;color:var(--deep)}
 .chip.on{background:var(--deep);color:var(--white);border-color:var(--deep)}
 
-/* MAP */
-.mapwrap{display:grid;grid-template-columns:1fr 300px;gap:18px}
-#map{height:470px;border-radius:18px;border:1px solid var(--line);z-index:1}
-.places{display:flex;flex-direction:column;gap:8px;max-height:470px;overflow:auto}
-.place{border:1px solid var(--line);border-radius:14px;padding:10px 14px;cursor:pointer;transition:.15s;background:var(--white)}
-.place:hover{border-color:var(--leaf);background:var(--sage)}
-.place b{font-family:Fraunces;font-size:17px;color:var(--jungle)}
-.place small{display:block;color:var(--muted);font-size:13px;line-height:1.35}
-.pin{width:34px;height:34px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:var(--palm);border:3px solid var(--white);box-shadow:0 4px 10px rgba(0,0,0,.3);display:grid;place-items:center}
-.pin span{transform:rotate(45deg);font-size:15px}
-.pin.small{width:24px;height:24px;background:var(--lagoon)}
-.pin.small span{font-size:11px}
-.leaflet-popup-content{font-family:Outfit}
-.leaflet-popup-content b{font-family:Fraunces;font-size:16px;color:var(--jungle)}
+/* MAPA IL·LUSTRAT */
+.mapart{border-radius:20px;overflow:hidden;border:1px solid var(--line);background:#9fdcd2}
+.mapart svg{display:block;width:100%;height:auto}
+.mapart .spot{cursor:pointer}
+.mapart .spot .ring{transform-box:fill-box;transform-origin:center;animation:pulse 2.4s ease-out infinite}
+.mapart .spot:hover .dot{fill:var(--coral)}
+.mapart .lbl{font-family:Fraunces;font-weight:800;font-size:22px;fill:var(--jungle);paint-order:stroke;stroke:#fffef9;stroke-width:6px;stroke-linejoin:round}
+.mapart .sub{font-family:Outfit;font-size:14px;fill:var(--deep);paint-order:stroke;stroke:#fffef9;stroke-width:4px;stroke-linejoin:round}
+.mapart .route{stroke-dasharray:8 9;animation:dash 30s linear infinite}
+@keyframes pulse{0%{transform:scale(.6);opacity:.9}100%{transform:scale(2.2);opacity:0}}
+@keyframes dash{to{stroke-dashoffset:-600}}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--muted);margin-top:12px}
+
+/* DESTINACIONS */
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.tab{border:2px solid var(--line);background:var(--white);border-radius:16px;padding:10px 18px;font-weight:600;font-size:15px;color:var(--deep);display:flex;align-items:center;gap:8px}
+.tab:hover{border-color:var(--leaf)}
+.tab.on{background:var(--deep);border-color:var(--deep);color:var(--white)}
+.tab small{font-size:11px;font-weight:600;background:var(--lime);color:var(--jungle);padding:2px 7px;border-radius:99px}
+.dhero{border-radius:20px;padding:26px 28px;color:var(--white);position:relative;overflow:hidden;margin-bottom:18px}
+.dhero h3{font-size:46px;font-style:italic;font-weight:800;color:var(--lime)}
+.dhero p{margin:6px 0 0;max-width:640px;color:#e9f6ec}
+.dhero .big{position:absolute;right:20px;bottom:-14px;font-size:120px;opacity:.25}
+.facts{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.facts span{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.2);border-radius:12px;padding:6px 12px;font-size:13px}
+.dgrid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:22px}
+.block{border:1px solid var(--line);border-radius:18px;padding:18px;background:var(--white)}
+.block h4{font-family:Fraunces;font-size:22px;color:var(--jungle);margin:0 0 10px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.cur{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.cur li{background:var(--sage);border-radius:12px;padding:9px 12px;font-size:14px}
+.plan{display:grid;grid-template-columns:62px 1fr auto;gap:12px;align-items:start;padding:10px 0;border-bottom:1px dashed var(--line)}
+.plan:last-child{border-bottom:0}
+.plan .when{background:var(--deep);color:var(--white);border-radius:12px;text-align:center;padding:6px 4px;font-size:12px;line-height:1.2}
+.plan .when b{display:block;font-family:Fraunces;font-size:20px}
+.plan .when.nod{background:var(--sage);color:var(--deep)}
+.plan.fet{opacity:.55}
+.sub2{font-family:Fraunces;font-size:24px;color:var(--jungle);margin:24px 0 12px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.by{font-size:12px;color:var(--muted)}
+
+/* QUI ETS */
+.me{border:0;background:var(--deep);color:var(--white);border-radius:99px;padding:5px 12px 5px 5px;font-weight:600;font-size:13px;display:flex;align-items:center;gap:6px;white-space:nowrap}
+.me .av{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:14px;background:var(--lime)}
+.whobox{max-width:520px;text-align:center}
+.whogrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:18px 0 6px}
+.whocard{border:2px solid var(--line);border-radius:18px;padding:16px 8px;background:var(--cream);font-family:Fraunces;font-size:20px;font-weight:800;color:var(--jungle);transition:.15s}
+.whocard:hover,.whocard.on{border-color:var(--palm);background:var(--sage);transform:translateY(-2px)}
+.whocard .av{width:58px;height:58px;border-radius:50%;margin:0 auto 8px;display:grid;place-items:center;font-size:30px}
+.emojis{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-top:10px}
+.emojis button{border:2px solid transparent;background:var(--sage);border-radius:12px;font-size:22px;width:44px;height:44px}
+.emojis button.on{border-color:var(--palm);background:var(--mint)}
+.mine{outline:2px solid var(--lime);outline-offset:1px}
 
 /* CLOCKS */
 .clocks{display:grid;grid-template-columns:1fr auto 1fr;gap:20px;align-items:center}
@@ -217,9 +253,11 @@ footer{text-align:center;color:var(--muted);font-size:14px;padding:30px 10px 50p
 @media (max-width:860px){
   .heroin{grid-template-columns:1fr;padding-top:30px}
   .polaroid{max-width:300px}
-  .mapwrap,.expgrid{grid-template-columns:1fr}
-  .places{max-height:none}
-  #map{height:380px}
+  .expgrid,.dgrid{grid-template-columns:1fr}
+  .dhero h3{font-size:36px}
+  .me .nm{display:none}
+  .me{padding:5px}
+  .mapart .lbl{font-size:30px}
   .clocks{grid-template-columns:1fr}
   section.card{padding:20px}
   .form{grid-template-columns:1fr}
@@ -235,10 +273,11 @@ footer{text-align:center;color:var(--muted);font-size:14px;padding:30px 10px 50p
   <div class="navin">
     <a class="brand" href="#inici"><span id="logoSmall"></span>Bali</a>
     <div class="links">
-      <a href="#mapa">🗺️ Mapa</a><a href="#hora">🕰️ Hora</a><a href="#vols">✈️ Vols</a><a href="#allotjament">🏡 Allotjament</a>
-      <a href="#asseguranca">🛟 Assegurança</a><a href="#despeses">💸 Despeses</a><a href="#checklist">✅ Checklist</a><a href="#recos">🌺 Recomanacions</a>
+      <a href="#mapa">🗺️ Ruta</a><a href="#destinacions">🌺 Destinacions</a><a href="#hora">🕰️ Hora</a><a href="#vols">✈️ Vols</a>
+      <a href="#asseguranca">🛟 Assegurança</a><a href="#despeses">💸 Despeses</a><a href="#checklist">✅ Checklist</a>
     </div>
     <span class="sync" id="sync">Carregant…</span>
+    <button class="me" id="meBtn" onclick="openWho()" title="Canviar qui ets"></button>
   </div>
 </nav>
 
@@ -271,11 +310,16 @@ footer{text-align:center;color:var(--muted);font-size:14px;padding:30px 10px 50p
 
 <!-- MAPA -->
 <section class="card" id="mapa">
-  <div class="sh"><div><h2>El mapa <em>de l'illa</em></h2><p>Toca un punt de la llista per anar-hi directe.</p></div></div>
-  <div class="mapwrap">
-    <div id="map"></div>
-    <div class="places" id="places"></div>
-  </div>
+  <div class="sh"><div><h2>La ruta <em>per l'illa</em></h2><p>Toqueu un destí per obrir-ne la pestanya.</p></div></div>
+  <div class="mapart" id="mapart"></div>
+  <div class="legend"><span>🟢 Destinacions</span><span>🟠 Opció per decidir</span><span>✈️ Aeroport</span><span>⛴️ Port de sortida de les barques</span></div>
+</section>
+
+<!-- DESTINACIONS -->
+<section class="card" id="destinacions">
+  <div class="sh"><div><h2>Destinacions 🌺</h2><p>Cada parada amb els seus plans, allotjaments, recomanacions i curiositats.</p></div></div>
+  <div class="tabs" id="tabs"></div>
+  <div id="dest"></div>
 </section>
 
 <!-- HORA -->
@@ -292,13 +336,6 @@ footer{text-align:center;color:var(--muted);font-size:14px;padding:30px 10px 50p
 <section class="card" id="vols">
   <div class="sh"><div><h2>Els vols ✈️</h2><p>Tota la info dels bitllets en un sol lloc.</p></div><button class="btn" onclick="editVol()">+ Afegir vol</button></div>
   <div id="volsList"></div>
-</section>
-
-<!-- ALLOTJAMENT -->
-<section class="card" id="allotjament">
-  <div class="sh"><div><h2>Allotjament 🏡</h2><p>Afegiu opcions per zona, compareu preus i marqueu les reservades.</p></div><button class="btn" onclick="editStay()">+ Afegir allotjament</button></div>
-  <div class="chips" id="stayChips"></div>
-  <div id="stayList"></div>
 </section>
 
 <!-- ASSEGURANÇA -->
@@ -333,31 +370,22 @@ footer{text-align:center;color:var(--muted);font-size:14px;padding:30px 10px 50p
   <div class="tip"><b>⚠️ Ull amb les estafes:</b> el visat, la targeta d'arribada i la taxa turística feu-los només a webs oficials acabades en <b>.go.id</b>. Hi ha moltes webs que cobren de més pel mateix tràmit.</div>
 </section>
 
-<!-- RECOMANACIONS -->
-<section class="card" id="recos">
-  <div class="sh"><div><h2>Recomanacions 🌺</h2><p>Llocs que valen la pena. Marqueu-los com a fets i afegiu els vostres descobriments.</p></div><button class="btn" onclick="editReco()">+ Afegir lloc</button></div>
-  <div class="chips" id="recoZones"></div>
-  <div class="chips" id="recoCats" style="margin-top:-8px"></div>
-  <div class="grid g3" id="recoList"></div>
-</section>
-
 </main>
 
 <footer>Fet amb 💚 per al viatge de la Jana, la Júlia i la Laura · Selamat jalan!</footer>
 
+<div class="modal" id="whoModal"><div class="mbox whobox"><h3>Hola! Qui ets? 👋</h3><p style="color:var(--muted);margin:0">Així sabrem qui afegeix cada cosa i et marcarem el que és teu.</p><div class="whogrid" id="whoGrid"></div><div id="whoEmo"></div><div class="mact" style="justify-content:center"><button class="btn" onclick="saveWho()">Som-hi! 🌴</button></div></div></div>
 <div class="modal" id="modal"><div class="mbox"><h3 id="mTitle"></h3><form id="mForm" class="form"></form><div class="mact"><button class="btn ghost" onclick="closeModal()">Cancel·la</button><button class="btn" id="mSave">Desa</button></div></div></div>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 /* =========================================================
    CONFIG
    ========================================================= */
 const PEOPLE = ['Jana','Júlia','Laura'];
-const KEYS = ['vols','allotjament','asseguranca','despeses','checklist','recos','config'];
+const KEYS = ['vols','allotjament','asseguranca','despeses','checklist','recos','plans','config'];
 const API = '/api/data';
 const LS = 'bali-jjl-v1';
-const ZONES = ['Ubud','Uluwatu','Canggu','Gili T','Seminyak','Altres'];
-const ZONE_EMOJI = {'Ubud':'🌿','Uluwatu':'🌊','Canggu':'🏄‍♀️','Gili T':'🐢','Seminyak':'🍹','Altres':'📍'};
+const ZONES = ['Ubud','Uluwatu','Gili T','Nusa Penida'];
 
 const uid = () => Math.random().toString(36).slice(2,9) + Date.now().toString(36).slice(-4);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -371,6 +399,7 @@ const gmaps = (q) => 'https://www.google.com/maps/search/?api=1&query=' + encode
    ========================================================= */
 const DEFAULTS = {
   vols: () => [],
+  plans: () => [],
   allotjament: () => [],
   despeses: () => [],
   config: () => ({ inici:'', fi:'', canvi:18500 }),
@@ -425,19 +454,18 @@ const DEFAULTS = {
       r('Uluwatu','Platja','Bingin Beach','Escales, warungs penjats a la roca i ambient surfer.'),
       r('Uluwatu','Festa','Single Fin','Posta de sol amb vistes a les onades. Els diumenges s\'anima molt.'),
       r('Uluwatu','Platja','Sundays Beach Club','Beach club amb ascensor inclinat fins a la sorra.'),
-      r('Canggu','Visitar','Tanah Lot','Temple sobre una roca enmig del mar. Ideal a la posta.'),
-      r('Canggu','Platja','Batu Bolong Beach','Surf per a principiants i pufs per veure la posta.'),
-      r('Canggu','Platja','Echo Beach','Onades fortes i bon peix a la brasa al vespre.'),
-      r('Canggu','Festa','La Brisa','Bar de platja fet amb fusta reciclada. Rotllo boho total.'),
-      r('Canggu','Festa','Finns Beach Club','El beach club gran de Berawa, amb piscines i DJ.'),
-      r('Canggu','Menjar','Crate Café','Esmorzars mítics i ambient de nòmades digitals.'),
       r('Gili T','Experiència','Snorkel amb tortugues','Tour de les tres Gili en barca: tortugues i estàtues submarines de Gili Meno.'),
       r('Gili T','Visitar','Gronxadors a la posta','A la costa oest, dins l\'aigua. Arribeu-hi una mica abans per agafar lloc.'),
       r('Gili T','Experiència','Volta a l\'illa en bici','No hi ha cotxes ni motos: tot en bici o a peu. La volta és d\'1 h aprox.'),
       r('Gili T','Menjar','Night Market','Peix a la brasa i menjar local barat, al costat del port.'),
       r('Gili T','Festa','Sama Sama Reggae Bar','Música en directe cada nit.'),
-      r('Altres','Excursió','Nusa Penida · Kelingking Beach','Excursió d\'un dia en barca des de Sanur. La famosa platja del T-Rex.'),
-      r('Seminyak','Festa','Potato Head Beach Club','Disseny, piscina infinita i posta de sol amb música.'),
+      r('Nusa Penida','Platja','Kelingking Beach','La famosa platja del T-Rex. Vistes increïbles des de dalt; la baixada és molt exigent.'),
+      r('Nusa Penida','Visitar','Broken Beach i Angel\'s Billabong','Un arc de roca natural i una piscina natural al costat. Ull amb les onades a la piscina.'),
+      r('Nusa Penida','Platja','Diamond Beach','Escales tallades a la roca fins a una platja de sorra blanca. Aneu-hi d\'hora.'),
+      r('Nusa Penida','Visitar','Atuh Beach','Just al costat de Diamond Beach, amb una roca en forma d\'arc dins el mar.'),
+      r('Nusa Penida','Experiència','Snorkel a Manta Point','Tour en barca per nedar amb mantes gegants. Normalment inclou Crystal Bay i Gamat Bay.'),
+      r('Nusa Penida','Platja','Crystal Bay','Aigua transparent, bon snorkel i posta de sol tranquil·la.'),
+      r('Nusa Penida','Experiència','Nusa Lembongan i el Yellow Bridge','Illa veïna més relaxada; el pont groc la uneix amb Nusa Ceningan. Bon pla d\'un dia.'),
     ];
   },
 };
@@ -493,11 +521,18 @@ async function load(){
     mode = 'local';
     for(const k of KEYS) if(S[k] == null) S[k] = DEFAULTS[k]();
   }
+  // migració: si la web ja estava publicada amb la versió anterior, afegeix les recomanacions de Nusa Penida
+  if(!S.config?.v2){
+    if(!(S.recos||[]).some(r => r.zona === 'Nusa Penida')){
+      for(const r of DEFAULTS.recos().filter(r => r.zona === 'Nusa Penida')) await commit('recos', {op:'upsert', item:r});
+    }
+    await commit('config', {op:'set', value:{...S.config, v2:true}});
+  }
   saveLocal(); renderAll(); setSync('ok');
 }
 // refresca cada 30 s i quan tornes a la pestanya (si ningú està editant)
 async function refresh(){
-  if(mode !== 'cloud' || document.getElementById('modal').classList.contains('open')) return;
+  if(mode !== 'cloud' || document.querySelector('.modal.open')) return;
   try{ const remote = await fetchRemote(); for(const k of KEYS) if(remote[k] != null) S[k] = remote[k]; saveLocal(); renderAll(); setSync('ok'); }catch(e){ setSync('err'); }
 }
 setInterval(refresh, 30000);
@@ -623,31 +658,255 @@ function tickCount(){
 setInterval(tickCount, 1000);
 
 /* =========================================================
-   MAPA
+   QUI ETS
    ========================================================= */
-const POINTS = [
-  {nom:'Aeroport de Denpasar (DPS)', e:'✈️', ll:[-8.7482,115.1670], d:'Aeroport Internacional Ngurah Rai. Al sud, a 15-30 min de Canggu/Uluwatu si no hi ha trànsit (i sempre n\'hi ha).'},
-  {nom:'Ubud', e:'🌿', ll:[-8.5069,115.2625], d:'El cor verd i espiritual: arrossars, selva, temples, ioga i cascades.'},
-  {nom:'Uluwatu', e:'🌊', ll:[-8.8149,115.0880], d:'Penya-segats, platges amagades, surf i les millors postes de sol.'},
-  {nom:'Canggu', e:'🏄‍♀️', ll:[-8.6478,115.1385], d:'Surf, cafès bonics, beach clubs i ambient jove.'},
-  {nom:'Gili Trawangan', e:'🐢', ll:[-8.3510,116.0390], d:'Illa sense cotxes: snorkel amb tortugues, bicis i festa. S\'hi va en fast boat (2-3 h).'},
-  {nom:'Port de Sanur', e:'⛴️', ll:[-8.6765,115.2630], d:'D\'aquí surten molts fast boats cap a Gili T i Nusa Penida.', small:true},
-  {nom:'Port de Padang Bai', e:'⛴️', ll:[-8.5300,115.5090], d:'Port alternatiu per anar a Gili T, més a l\'est.', small:true},
-];
-let map, markers = [];
-function initMap(){
-  map = L.map('map', {scrollWheelZoom:false}).setView([-8.55,115.55], 9);
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-    attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>', maxZoom:18
-  }).addTo(map);
-  POINTS.forEach((p,i) => {
-    const icon = L.divIcon({className:'', html:`<div class="pin ${p.small?'small':''}"><span>${p.e}</span></div>`, iconSize:p.small?[24,24]:[34,34], iconAnchor:p.small?[12,24]:[17,34], popupAnchor:[0,-30]});
-    markers[i] = L.marker(p.ll, {icon}).addTo(map).bindPopup(`<b>${p.e} ${p.nom}</b><br>${p.d}<br><a href="${gmaps(p.nom+' Bali Indonesia')}" target="_blank" rel="noopener">Obrir a Google Maps ↗</a>`);
-  });
-  const g = L.featureGroup(markers); map.fitBounds(g.getBounds(), {padding:[30,30]});
-  document.getElementById('places').innerHTML = POINTS.map((p,i) => `<div class="place" onclick="goPlace(${i})"><b>${p.e} ${p.nom}</b><small>${p.d}</small></div>`).join('');
+const ME_KEY = 'bali-jjl-me';
+let ME = (() => { try{ const v = localStorage.getItem(ME_KEY); return PEOPLE.includes(v) ? v : ''; }catch(e){ return ''; } })();
+const EMOJIS = ['🌺','🐢','🌴','🥥','🐒','🌊','🍍','🦋','🌸','☀️','🐚','🍹'];
+const AV_BG = {'Jana':'#d5ec7c','Júlia':'#bfe5c8','Laura':'#f2e5c6'};
+const emo = p => (S.config?.perfils || {})[p] || {'Jana':'🌺','Júlia':'🐢','Laura':'🌴'}[p];
+let whoPick = '', emoPick = '';
+function openWho(){
+  whoPick = ME || ''; emoPick = whoPick ? emo(whoPick) : '';
+  renderWho(); document.getElementById('whoModal').classList.add('open');
 }
-function goPlace(i){ map.flyTo(POINTS[i].ll, 12, {duration:1.2}); markers[i].openPopup(); }
+function renderWho(){
+  document.getElementById('whoGrid').innerHTML = PEOPLE.map(p => `<button class="whocard ${whoPick===p?'on':''}" onclick="pickWho('${p}')"><div class="av" style="background:${AV_BG[p]}">${emo(p)}</div>${p}</button>`).join('');
+  document.getElementById('whoEmo').innerHTML = whoPick ? `<p style="margin:12px 0 0;font-size:14px;color:var(--muted)">Tria el teu emoji, ${whoPick}:</p><div class="emojis">${EMOJIS.map(e => `<button class="${emoPick===e?'on':''}" onclick="pickEmo('${e}')">${e}</button>`).join('')}</div>` : '';
+}
+function pickWho(p){ whoPick = p; emoPick = emo(p); renderWho(); }
+function pickEmo(e){ emoPick = e; renderWho(); }
+function saveWho(){
+  if(!whoPick){ alert('Tria qui ets 🙂'); return; }
+  ME = whoPick; try{ localStorage.setItem(ME_KEY, ME); }catch(e){}
+  document.getElementById('whoModal').classList.remove('open');
+  if(emoPick && emoPick !== emo(ME)) commit('config', {op:'set', value:{...S.config, perfils:{...(S.config?.perfils||{}), [ME]:emoPick}}});
+  renderAll();
+}
+function renderMe(){
+  document.getElementById('meBtn').innerHTML = ME ? `<span class="av" style="background:${AV_BG[ME]}">${emo(ME)}</span><span class="nm">${ME}</span>` : `<span class="av">👋</span><span class="nm">Qui ets?</span>`;
+}
+const byLine = it => it.autor ? `<span class="by">${emo(it.autor)} afegit per ${esc(it.autor)}</span>` : '';
+const stamp = (x, isNew) => { if(isNew && ME) x.autor = ME; return x; };
+
+/* =========================================================
+   DESTINACIONS: contingut fix
+   ========================================================= */
+const DEST = {
+  'Ubud': {e:'🌿', opt:false, grad:'linear-gradient(135deg,#0c3528,#1d7a50)',
+    intro:'El cor verd i espiritual de Bali: arrossars en terrasses, selva, temples, cascades, ioga i mercats d\'artesania.',
+    facts:['🚗 1-1,5 h des de l\'aeroport','🌡️ Més fresc a la nit','🧘 Vibe: zen i natura'],
+    cur:[
+      'El sistema de reg dels arrossars, el <b>subak</b>, és Patrimoni de la Humanitat de la UNESCO des del 2012. Funciona des del segle IX gestionat pels temples de l\'aigua.',
+      'Veureu per tot arreu les <b>canang sari</b>: cistelletes de fulla de palmera amb flors i incens que s\'ofereixen cada dia. Mireu on trepitgeu! 🌸',
+      'Part de <i>Menja, resa, estima</i> es va rodar aquí, i des d\'aleshores Ubud és la capital mundial del ioga i el wellness.',
+      'Al Monkey Forest hi viuen més de mil macacos. Són molt espavilats: res de menjar ni coses penjant a la vista 🐒',
+    ]},
+  'Uluwatu': {e:'🌊', opt:false, grad:'linear-gradient(135deg,#12503a,#37b8a6)',
+    intro:'Penya-segats sobre l\'Índic, platges amagades entre roques, surf i les millors postes de sol de l\'illa.',
+    facts:['🚗 30-45 min des de l\'aeroport','🏄‍♀️ Paradís surfer','🌅 Postes de sol de 10'],
+    cur:[
+      'El temple <b>Pura Luhur Uluwatu</b> està penjat sobre un penya-segat d\'uns 70 metres i és un dels sis temples que protegeixen Bali.',
+      'La <b>dansa Kecak</b> no té instruments: només un cor de dotzenes d\'homes cantant "cak-cak-cak". Es va crear als anys 30 i explica una escena del Ramayana.',
+      'Els micos del temple són famosos per robar ulleres de sol i mòbils i "tornar-los" a canvi de menjar 🙈',
+      'Uluwatu es va fer mundialment famós pel surf amb la pel·lícula <i>Morning of the Earth</i> (1972).',
+    ]},
+  'Gili T': {e:'🐢', opt:true, grad:'linear-gradient(135deg,#1d7a50,#37b8a6)',
+    intro:'Illa petitíssima sense cotxes ni motos: bicis, aigua turquesa, tortugues i festa a la nit.',
+    facts:['⛴️ 2-3 h en fast boat des de Sanur o Padang Bai','🚲 Tot en bici o a peu','🍹 Vibe: platja + festa'],
+    cur:[
+      '<b>Gili</b> vol dir "illa petita" en sasak, la llengua de Lombok. Tècnicament ja no sou a Bali: les Gili són de Lombok!',
+      'No hi ha vehicles de motor: us movireu en bici, a peu o en carro de cavalls (cidomo).',
+      'La majoria de la població és musulmana, així que sentireu la crida a la pregària. Fora de les platges, millor tapar-se una mica.',
+      'És un dels millors llocs del món per nedar amb tortugues marines, a pocs metres de la sorra 🐢',
+    ]},
+  'Nusa Penida': {e:'🦖', opt:true, grad:'linear-gradient(135deg,#0c3528,#ef8a6b)',
+    intro:'Illa salvatge davant de Bali: penya-segats de vertigen, platges de postal i snorkel amb mantes.',
+    facts:['⛴️ 30-45 min en fast boat des de Sanur','🛵 Carreteres complicades','📸 Vibe: aventura i paisatges'],
+    cur:[
+      'És més gran del que sembla i les carreteres són dolentes: comptar com a mínim 2 dies per veure el que val la pena.',
+      'La baixada a <b>Kelingking Beach</b> (la platja del T-Rex 🦖) és molt dreta i dura. Amb calçat bo i aigua, o mirar-la des de dalt.',
+      'Segons la tradició balinesa, aquí hi vivia el rei dels dimonis, Ratu Gede Mecaling. Per això molts balinesos hi peregrinen al temple Pura Dalem Ped.',
+      'A <b>Manta Point</b> s\'hi poden veure mantes gegants tot l\'any, i de juliol a octubre, a Crystal Bay, de vegades apareix el peix lluna (mola mola).',
+    ]},
+};
+const ZONE_EMOJI_D = Object.fromEntries(Object.entries(DEST).map(([k,v]) => [k, v.e]));
+let curDest = 'Ubud';
+function setDest(z, scroll){ curDest = z; renderDest(); if(scroll) document.getElementById('destinacions').scrollIntoView({behavior:'smooth'}); }
+
+/* =========================================================
+   MAPA IL·LUSTRAT
+   ========================================================= */
+function drawMap(){
+  const spot = (x, y, z, sub, color='#1d7a50', lx=18, ly=6, anchor='start') => `<g class="spot" onclick="setDest('${z}',true)">
+    <circle class="ring" cx="${x}" cy="${y}" r="12" fill="${color}" opacity=".5"/>
+    <circle class="dot" cx="${x}" cy="${y}" r="11" fill="${color}" stroke="#fffef9" stroke-width="4"/>
+    <text class="lbl" x="${x+lx}" y="${y+ly}" text-anchor="${anchor}">${DEST[z].e} ${z}</text>
+    ${sub?`<text class="sub" x="${x+lx}" y="${y+ly+20}" text-anchor="${anchor}">${sub}</text>`:''}</g>`;
+  const mini = (x, y, t, e, anchor='start', dx=12) => `<g><circle cx="${x}" cy="${y}" r="6" fill="#0c3528" stroke="#fffef9" stroke-width="2.5"/><text class="sub" x="${x+dx}" y="${y+5}" text-anchor="${anchor}">${e} ${t}</text></g>`;
+  const palm = (x, y, s=1) => `<g transform="translate(${x} ${y}) scale(${s})"><path d="M0 0 Q3 -18 -2 -34" stroke="#7a5a3a" stroke-width="3" fill="none"/><path d="M-2 -34 q-14 -6 -24 4 q12 -10 24 -4 q-6 -14 -20 -14 q14 2 20 14 q4 -14 18 -14 q-14 4 -18 14 q14 -4 22 6 q-12 -8 -22 -6z" fill="#1d7a50"/></g>`;
+  document.getElementById('mapart').innerHTML = `<svg viewBox="0 0 960 470" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Mapa il·lustrat de Bali">
+    <defs>
+      <pattern id="wv" width="60" height="22" patternUnits="userSpaceOnUse"><path d="M0 11 q15 -8 30 0 t30 0" stroke="#fffef9" stroke-opacity=".35" stroke-width="2" fill="none"/></pattern>
+      <linearGradient id="land" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7cc48a"/><stop offset="1" stop-color="#46a876"/></linearGradient>
+    </defs>
+    <rect width="960" height="470" fill="#9fdcd2"/>
+    <rect width="960" height="470" fill="url(#wv)"/>
+    <g fill="#bfe9e1" opacity=".8">
+      <path d="M42,86 C49,75 69,65 88,62 C107,60 127,68 156,73 C185,78 228,92 260,94 C292,95 328,89 348,83 C369,77 367,62 385,57 C402,52 432,51 452,52 C473,53 488,55 510,62 C531,70 560,86 582,99 C605,112 628,127 645,140 C661,153 671,166 681,177 C692,187 709,192 707,203 C705,213 683,229 671,239 C659,250 646,259 634,265 C623,272 618,273 603,278 C588,283 564,288 546,296 C528,305 506,317 494,328 C482,338 479,348 473,359 C468,369 462,380 460,390 C458,400 463,407 460,416 C457,425 450,438 442,442 C434,446 420,444 411,442 C401,440 388,437 385,432 C381,426 384,416 390,411 C396,406 413,407 419,403 C424,399 422,391 421,385 C421,378 419,371 416,364 C413,357 411,348 406,341 C400,334 400,333 385,322 C369,312 339,290 312,276 C285,261 252,245 224,234 C195,223 165,218 140,208 C116,198 94,185 78,172 C62,159 53,144 47,130 C41,116 35,97 42,86Z" transform="translate(-6 -6) scale(1.015)"/>
+    </g>
+    <!-- Lombok -->
+    <path d="M910,0 C878,26 926,121 926,156 C926,191 915,186 910,208 C905,230 894,260 894,286 C894,312 909,338 910,364 C911,390 898,416 900,442 C901,468 884,507 920,520 L1000,520 L1000,0Z" fill="#a9d4a0" stroke="#fffef9" stroke-width="3"/>
+    <text class="sub" x="944" y="300" text-anchor="end" style="font-style:italic">Lombok</text>
+    <!-- Bali -->
+    <path d="M42,86 C49,75 69,65 88,62 C107,60 127,68 156,73 C185,78 228,92 260,94 C292,95 328,89 348,83 C369,77 367,62 385,57 C402,52 432,51 452,52 C473,53 488,55 510,62 C531,70 560,86 582,99 C605,112 628,127 645,140 C661,153 671,166 681,177 C692,187 709,192 707,203 C705,213 683,229 671,239 C659,250 646,259 634,265 C623,272 618,273 603,278 C588,283 564,288 546,296 C528,305 506,317 494,328 C482,338 479,348 473,359 C468,369 462,380 460,390 C458,400 463,407 460,416 C457,425 450,438 442,442 C434,446 420,444 411,442 C401,440 388,437 385,432 C381,426 384,416 390,411 C396,406 413,407 419,403 C424,399 422,391 421,385 C421,378 419,371 416,364 C413,357 411,348 406,341 C400,334 400,333 385,322 C369,312 339,290 312,276 C285,261 252,245 224,234 C195,223 165,218 140,208 C116,198 94,185 78,172 C62,159 53,144 47,130 C41,116 35,97 42,86Z" fill="url(#land)" stroke="#fffef9" stroke-width="4"/>
+    <!-- arrossars -->
+    <g stroke="#d5ec7c" stroke-width="3" fill="none" opacity=".7"><path d="M440 230 q35 -12 70 0"/><path d="M445 242 q30 -10 60 0"/><path d="M450 254 q25 -8 50 0"/></g>
+    <!-- volcans -->
+    <g><path d="M572 190 L602 140 L632 190Z" fill="#5b8a5c"/><path d="M594 153 L602 140 L610 153 Q602 158 594 153Z" fill="#fffef9"/><text class="sub" x="602" y="208" text-anchor="middle">Agung</text></g>
+    <g><path d="M508 142 L533 104 L558 142Z" fill="#6b9a68"/><path d="M527 113 L533 104 L539 113Z" fill="#3d5d40"/><text class="sub" x="533" y="160" text-anchor="middle">Batur</text></g>
+    ${palm(190,190,.9)}${palm(300,200,.8)}${palm(640,255,.7)}${palm(150,110,.7)}
+    <!-- Nusa Penida + Lembongan -->
+    <path d="M582,364 C592,358 616,348 629,348 C642,348 656,355 660,364 C665,373 661,391 655,400 C649,410 635,419 624,421 C613,423 596,417 588,411 C579,405 573,393 572,385 C571,377 573,370 582,364Z" fill="url(#land)" stroke="#fffef9" stroke-width="3"/>
+    <path d="M562,346 C563,343 574,341 577,343 C581,345 584,356 582,359 C581,362 570,364 567,361 C563,359 560,349 562,346Z" fill="#7cc48a" stroke="#fffef9" stroke-width="2"/>
+    <!-- Gili -->
+    <g fill="#f2e5c6" stroke="#fffef9" stroke-width="2"><ellipse cx="868" cy="182" rx="9" ry="7"/><ellipse cx="884" cy="183" rx="6" ry="5"/><ellipse cx="898" cy="186" rx="7" ry="5"/></g>
+    <!-- ruta -->
+    <g fill="none" stroke-linecap="round">
+      <path class="route" d="M425 389 C 440 330 455 300 475 264" stroke="#0c3528" stroke-width="3"/>
+      <path class="route" d="M475 264 C 430 330 400 380 384 431" stroke="#0c3528" stroke-width="3"/>
+      <path class="route" d="M475 354 C 560 300 720 210 868 182" stroke="#ef8a6b" stroke-width="3"/>
+      <path class="route" d="M475 354 C 520 360 570 370 619 380" stroke="#ef8a6b" stroke-width="3"/>
+    </g>
+    ${mini(425,389,'Aeroport DPS','✈️','start',12)}
+    ${mini(475,354,'Sanur','⛴️','start',12)}
+    ${mini(512,322,'Padang Bai','⛴️','start',12).replace('cx="512" cy="322"','cx="510" cy="318"')}
+    ${spot(475,264,'Ubud','Arrossars i selva','#1d7a50',-18,-18,'end')}
+    ${spot(384,431,'Uluwatu','Penya-segats i surf','#1d7a50',-18,4,'end')}
+    ${spot(876,183,'Gili T','Opció B','#ef8a6b',-6,40,'end')}
+    ${spot(619,382,'Nusa Penida','Opció A','#ef8a6b',20,50,'start')}
+    <g transform="translate(70 400)"><circle r="30" fill="#fffef9" opacity=".85"/><path d="M0 -24 L7 0 L0 24 L-7 0Z" fill="#0c3528"/><path d="M0 -24 L7 0 L-7 0Z" fill="#ef8a6b"/><text x="0" y="-34" text-anchor="middle" class="sub" style="font-weight:700">N</text></g>
+    <text x="230" y="300" class="lbl" style="font-size:44px;font-style:italic;fill:#12503a;stroke-width:0;opacity:.35">Bali</text>
+    <text x="190" y="440" class="sub" style="font-style:italic">Oceà Índic</text>
+    <text x="300" y="30" class="sub" style="font-style:italic">Mar de Bali</text>
+  </svg>`;
+}
+
+/* =========================================================
+   DESTINACIONS: render
+   ========================================================= */
+let recoCat = 'Tot';
+const RECO_CATS = ['Visitar','Platja','Menjar','Festa','Experiència','Compres'];
+const RECO_ICON = {'Visitar':'🛕','Platja':'🏖️','Menjar':'🍜','Festa':'🍹','Experiència':'🤿','Excursió':'🚤','Compres':'🛍️'};
+const PLAN_FIELDS = [
+  {k:'titol', label:'Pla', ph:'Trekking al Batur', full:true},
+  {k:'zona', label:'Destinació', type:'select', opts:ZONES},
+  {k:'data', label:'Dia', type:'date'},
+  {k:'hora', label:'Hora', type:'time'},
+  {k:'preu', label:'Preu per persona (€)', type:'number'},
+  {k:'link', label:'Enllaç (reserva, info…)', type:'url', full:true},
+  {k:'notes', label:'Notes', type:'textarea', full:true},
+];
+function editPlan(id){ const it = id ? find('plans', id) : {zona:curDest}; openForm(id ? 'Editar pla' : 'Nou pla ✨', PLAN_FIELDS, it, x => commit('plans', {op:'upsert', item:stamp(x, !id)})); }
+function togglePlan(id){ const it = find('plans', id); commit('plans', {op:'upsert', item:{...it, fet:!it.fet}}); }
+const RECO_FIELDS = [
+  {k:'nom', label:'Nom del lloc', full:true},
+  {k:'zona', label:'Destinació', type:'select', opts:ZONES},
+  {k:'cat', label:'Tipus', type:'select', opts:RECO_CATS},
+  {k:'nota', label:'Per què val la pena', type:'textarea', full:true},
+  {k:'link', label:'Enllaç (opcional; si no, es busca a Google Maps)', type:'url', full:true},
+];
+function editReco(id){ const it = id ? find('recos', id) : {zona:curDest, cat:'Visitar', fet:false}; openForm(id ? 'Editar lloc' : 'Nou lloc 🌺', RECO_FIELDS, it, x => commit('recos', {op:'upsert', item:stamp(x, !id)})); }
+function toggleReco(id){ const it = find('recos', id); commit('recos', {op:'upsert', item:{...it, fet:!it.fet}}); }
+function setRC(c){ recoCat = c; renderDest(); }
+const STAY_FIELDS = [
+  {k:'nom', label:'Nom', ph:'Villa Bambú', full:true},
+  {k:'zona', label:'Destinació', type:'select', opts:ZONES},
+  {k:'estat', label:'Estat', type:'select', opts:['Opció','Reservat','Descartat']},
+  {k:'link', label:'Enllaç (Booking, Airbnb…)', type:'url', full:true},
+  {k:'preuNit', label:'Preu per nit (€, total habitació)', type:'number'},
+  {k:'nits', label:'Nits', type:'number'},
+  {k:'checkin', label:'Check-in', type:'date'},
+  {k:'checkout', label:'Check-out', type:'date'},
+  {k:'valoracio', label:'Valoració', type:'select', opts:['','1','2','3','4','5']},
+  {k:'piscina', label:'Piscina?', type:'select', opts:['','Sí','No']},
+  {k:'pros', label:'👍 Pros', type:'textarea'},
+  {k:'contres', label:'👎 Contres', type:'textarea'},
+  {k:'notes', label:'Notes', type:'textarea', full:true},
+];
+function editStay(id){ const it = id ? find('allotjament', id) : {zona:curDest, estat:'Opció'}; openForm(id ? 'Editar allotjament' : 'Nou allotjament 🏡', STAY_FIELDS, it, x => commit('allotjament', {op:'upsert', item:stamp(x, !id)})); }
+
+function stayCards(items){
+  const live = items.filter(s => s.estat !== 'Descartat' && +s.preuNit > 0);
+  const cheapest = live.length > 1 ? live.reduce((m,s) => +s.preuNit < +m.preuNit ? s : m) : null;
+  return items.map(s => {
+    const nits = +s.nits || (s.checkin && s.checkout ? Math.round((new Date(s.checkout) - new Date(s.checkin))/864e5) : 0);
+    const tot = (+s.preuNit||0) * nits;
+    const st = s.estat === 'Reservat' ? 'res' : s.estat === 'Descartat' ? 'desc' : '';
+    return `<div class="stay ${st}">
+      <div class="acts"><button class="ico" onclick="editStay('${s.id}')">✏️</button><button class="ico" onclick="del('allotjament','${s.id}','aquest allotjament')">🗑️</button></div>
+      <h4>${esc(s.nom||'Sense nom')}</h4>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <span class="pill ${s.estat==='Reservat'?'ok':s.estat==='Descartat'?'no':''}">${s.estat==='Reservat'?'✅ ':''}${esc(s.estat||'Opció')}</span>
+        ${cheapest && cheapest.id===s.id ? '<span class="pill lime">💚 La més barata</span>' : ''}
+        ${s.piscina==='Sí' ? '<span class="pill">🏊‍♀️ Piscina</span>' : ''}
+        ${s.valoracio ? `<span class="stars">${'★'.repeat(+s.valoracio)}${'☆'.repeat(5-+s.valoracio)}</span>` : ''}
+      </div>
+      <div class="prices">
+        <div><b>${s.preuNit?eur(+s.preuNit):'—'}</b>per nit</div>
+        <div><b>${nits||'—'}</b>nits</div>
+        <div><b>${tot?eur(tot):'—'}</b>total</div>
+        <div><b>${tot?eur(tot/3):'—'}</b>per persona</div>
+      </div>
+      ${s.checkin?`<small style="color:var(--muted)">📅 ${fmtDate(s.checkin)} → ${fmtDate(s.checkout)}</small>`:''}
+      ${s.pros||s.contres?`<div class="pc">${s.pros?`<div class="p">👍 ${esc(s.pros)}</div>`:''}${s.contres?`<div class="c">👎 ${esc(s.contres)}</div>`:''}</div>`:''}
+      ${s.notes?`<small style="color:var(--muted)">📝 ${esc(s.notes)}</small>`:''}
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap">${s.link?`<a href="${esc(safeUrl(s.link))}" target="_blank" rel="noopener" style="font-weight:600;font-size:14px">Veure allotjament ↗</a>`:'<span></span>'}${byLine(s)}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderDest(){
+  document.getElementById('tabs').innerHTML = ZONES.map(z => `<button class="tab ${curDest===z?'on':''}" onclick="setDest('${z}')">${DEST[z].e} ${z}${DEST[z].opt?' <small>opció</small>':''}</button>`).join('');
+  const d = DEST[curDest], z = curDest;
+  const plans = (S.plans||[]).filter(p => p.zona === z).sort((a,b) => (a.data||'9').localeCompare(b.data||'9') || (a.hora||'').localeCompare(b.hora||''));
+  const stays = (S.allotjament||[]).filter(s => s.zona === z).sort((a,b) => (a.estat==='Descartat') - (b.estat==='Descartat') || (b.estat==='Reservat') - (a.estat==='Reservat') || (+a.preuNit||1e9) - (+b.preuNit||1e9));
+  const recosZ = (S.recos||[]).filter(r => r.zona === z);
+  const cats = ['Tot', ...RECO_CATS.filter(c => recosZ.some(r => r.cat === c))];
+  if(!cats.includes(recoCat)) recoCat = 'Tot';
+  const recos = recosZ.filter(r => recoCat === 'Tot' || r.cat === recoCat).sort((a,b) => (a.fet?1:0) - (b.fet?1:0));
+  document.getElementById('dest').innerHTML = `
+    <div class="dhero" style="background:${d.grad}"><div class="big">${d.e}</div>
+      <h3>${z}</h3><p>${d.intro}</p>
+      <div class="facts">${d.facts.map(f => `<span>${f}</span>`).join('')}${d.opt?'<span>🤔 Encara per decidir: Gili T o Nusa Penida</span>':''}</div>
+    </div>
+    <div class="dgrid">
+      <div class="block"><h4>✨ Plans <button class="btn sm" onclick="editPlan()">+ Afegir pla</button></h4>
+        ${plans.length ? plans.map(p => {
+          const dt = p.data ? new Date(p.data+'T12:00:00') : null;
+          return `<div class="plan ${p.fet?'fet':''}">
+            <div class="when ${dt?'':'nod'}">${dt?`<b>${dt.getDate()}</b>${dt.toLocaleDateString('ca-ES',{month:'short'})}`:'<b>?</b>sense dia'}</div>
+            <div><b>${esc(p.titol||'Pla')}</b>${p.hora?` · ${esc(p.hora)}`:''}${p.preu?` · ${eur(+p.preu)}/pers.`:''}
+              ${p.notes?`<div style="font-size:13px;color:var(--muted)">${esc(p.notes)}</div>`:''}
+              <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:2px">${p.link?`<a href="${esc(safeUrl(p.link))}" target="_blank" rel="noopener" style="font-size:13px;font-weight:600">Enllaç ↗</a>`:''}${byLine(p)}</div></div>
+            <div style="white-space:nowrap"><button class="ico" title="Fet" onclick="togglePlan('${p.id}')">${p.fet?'✅':'⬜'}</button><button class="ico" onclick="editPlan('${p.id}')">✏️</button><button class="ico" onclick="del('plans','${p.id}','aquest pla')">🗑️</button></div>
+          </div>`; }).join('') : `<div class="empty">Encara no hi ha plans a ${esc(z)}. Afegiu excursions, reserves, sopars…</div>`}
+      </div>
+      <div class="block"><h4>🤓 Curiositats</h4><ul class="cur">${d.cur.map(c => `<li>${c}</li>`).join('')}</ul></div>
+    </div>
+    <div class="sub2"><span>🏡 Allotjament a ${esc(z)}</span><button class="btn sm" onclick="editStay()">+ Afegir allotjament</button></div>
+    ${stays.length ? `<div class="grid g2">${stayCards(stays)}</div>` : `<div class="empty">Afegiu les opcions que aneu trobant i aquí es compararan 🏝️</div>`}
+    <div class="sub2"><span>🌺 Recomanacions</span><button class="btn sm" onclick="editReco()">+ Afegir lloc</button></div>
+    <div class="chips">${cats.map(c => `<button class="chip ${recoCat===c?'on':''}" onclick="setRC('${c}')">${RECO_ICON[c]||'✨'} ${c}</button>`).join('')}</div>
+    <div class="grid g3">${recos.length ? recos.map(r => `<div class="reco ${r.fet?'fet':''}">
+      <div class="acts"><button class="ico" onclick="editReco('${r.id}')">✏️</button><button class="ico" onclick="del('recos','${r.id}','aquest lloc')">🗑️</button></div>
+      <div><span class="pill" style="background:var(--sand)">${RECO_ICON[r.cat]||'✨'} ${esc(r.cat)}</span></div>
+      <h4>${esc(r.nom)}</h4><p>${esc(r.nota)}</p>${byLine(r)}
+      <div class="foot">
+        <a href="${esc(r.link ? safeUrl(r.link) : gmaps(r.nom + ' ' + r.zona + ' Indonesia'))}" target="_blank" rel="noopener">📍 Veure al mapa ↗</a>
+        <button class="btn sm ${r.fet?'':'ghost'}" onclick="toggleReco('${r.id}')">${r.fet?'✓ Fet!':'Marcar com a fet'}</button>
+      </div></div>`).join('') : `<div class="empty" style="grid-column:1/-1">Res per aquí. Afegiu-hi els vostres descobriments 🌺</div>`}</div>`;
+}
 
 /* =========================================================
    RELLOTGES
@@ -708,7 +967,7 @@ const VOL_FIELDS = [
   {k:'link', label:'Enllaç a la reserva', type:'url', full:true},
   {k:'notes', label:'Notes (maletes, seients…)', type:'textarea', full:true},
 ];
-function editVol(id){ const it = id ? find('vols', id) : {}; openForm(id ? 'Editar vol' : 'Nou vol ✈️', VOL_FIELDS, it, x => commit('vols', {op:'upsert', item:x})); }
+function editVol(id){ const it = id ? find('vols', id) : {}; openForm(id ? 'Editar vol' : 'Nou vol ✈️', VOL_FIELDS, it, x => commit('vols', {op:'upsert', item:stamp(x, !id)})); }
 const fmtDate = d => d ? new Date(d+'T12:00:00').toLocaleDateString('ca-ES', {weekday:'short', day:'numeric', month:'short'}) : '';
 function renderVols(){
   const list = (S.vols||[]).slice().sort((a,b) => (a.data||'9').localeCompare(b.data||'9') || (a.hSortida||'').localeCompare(b.hSortida||''));
@@ -735,69 +994,6 @@ function renderVols(){
 }
 
 /* =========================================================
-   ALLOTJAMENT
-   ========================================================= */
-let stayZone = 'Totes';
-const STAY_FIELDS = [
-  {k:'nom', label:'Nom', ph:'Villa Bambú', full:true},
-  {k:'zona', label:'Zona', type:'select', opts:ZONES},
-  {k:'estat', label:'Estat', type:'select', opts:['Opció','Reservat','Descartat']},
-  {k:'link', label:'Enllaç (Booking, Airbnb…)', type:'url', full:true},
-  {k:'preuNit', label:'Preu per nit (€, total habitació)', type:'number'},
-  {k:'nits', label:'Nits', type:'number'},
-  {k:'checkin', label:'Check-in', type:'date'},
-  {k:'checkout', label:'Check-out', type:'date'},
-  {k:'valoracio', label:'Valoració', type:'select', opts:['','1','2','3','4','5']},
-  {k:'piscina', label:'Piscina?', type:'select', opts:['','Sí','No']},
-  {k:'pros', label:'👍 Pros', type:'textarea'},
-  {k:'contres', label:'👎 Contres', type:'textarea'},
-  {k:'notes', label:'Notes', type:'textarea', full:true},
-];
-function editStay(id){ const it = id ? find('allotjament', id) : {zona: stayZone !== 'Totes' ? stayZone : 'Ubud', estat:'Opció'}; openForm(id ? 'Editar allotjament' : 'Nou allotjament 🏡', STAY_FIELDS, it, x => commit('allotjament', {op:'upsert', item:x})); }
-function setStayZone(z){ stayZone = z; renderStay(); }
-function renderStay(){
-  const all = S.allotjament||[];
-  document.getElementById('stayChips').innerHTML = ['Totes', ...ZONES].map(z => {
-    const n = z === 'Totes' ? all.length : all.filter(s => s.zona === z).length;
-    return `<button class="chip ${stayZone===z?'on':''}" onclick="setStayZone('${z}')">${ZONE_EMOJI[z]||'🌍'} ${z} ${n?`(${n})`:''}</button>`;
-  }).join('');
-  const el = document.getElementById('stayList');
-  if(!all.length){ el.innerHTML = `<div class="empty">Afegiu les opcions que aneu trobant i aquí es compararan per zona 🏝️</div>`; return; }
-  const zones = (stayZone === 'Totes' ? ZONES : [stayZone]).filter(z => all.some(s => s.zona === z));
-  if(!zones.length){ el.innerHTML = `<div class="empty">Encara no hi ha res a ${esc(stayZone)}.</div>`; return; }
-  el.innerHTML = zones.map(z => {
-    const items = all.filter(s => s.zona === z).sort((a,b) => (a.estat==='Descartat') - (b.estat==='Descartat') || (+a.preuNit||1e9) - (+b.preuNit||1e9));
-    const live = items.filter(s => s.estat !== 'Descartat' && +s.preuNit > 0);
-    const cheapest = live.length > 1 ? live.reduce((m,s) => +s.preuNit < +m.preuNit ? s : m) : null;
-    return `<div class="zone"><h3>${ZONE_EMOJI[z]} ${z}</h3><div class="grid g2">${items.map(s => {
-      const nits = +s.nits || (s.checkin && s.checkout ? Math.round((new Date(s.checkout) - new Date(s.checkin))/864e5) : 0);
-      const tot = (+s.preuNit||0) * nits;
-      const st = s.estat === 'Reservat' ? 'res' : s.estat === 'Descartat' ? 'desc' : '';
-      return `<div class="stay ${st}">
-        <div class="acts"><button class="ico" onclick="editStay('${s.id}')">✏️</button><button class="ico" onclick="del('allotjament','${s.id}','aquest allotjament')">🗑️</button></div>
-        <h4>${esc(s.nom||'Sense nom')}</h4>
-        <div style="display:flex;gap:6px;flex-wrap:wrap">
-          <span class="pill ${s.estat==='Reservat'?'ok':s.estat==='Descartat'?'no':''}">${s.estat==='Reservat'?'✅ ':''}${esc(s.estat||'Opció')}</span>
-          ${cheapest && cheapest.id===s.id ? '<span class="pill lime">💚 La més barata</span>' : ''}
-          ${s.piscina==='Sí' ? '<span class="pill">🏊‍♀️ Piscina</span>' : ''}
-          ${s.valoracio ? `<span class="stars">${'★'.repeat(+s.valoracio)}${'☆'.repeat(5-+s.valoracio)}</span>` : ''}
-        </div>
-        <div class="prices">
-          <div><b>${s.preuNit?eur(+s.preuNit):'—'}</b>per nit</div>
-          <div><b>${nits||'—'}</b>nits</div>
-          <div><b>${tot?eur(tot):'—'}</b>total</div>
-          <div><b>${tot?eur(tot/3):'—'}</b>per persona</div>
-        </div>
-        ${s.checkin?`<small style="color:var(--muted)">📅 ${fmtDate(s.checkin)} → ${fmtDate(s.checkout)}</small>`:''}
-        ${s.pros||s.contres?`<div class="pc">${s.pros?`<div class="p">👍 ${esc(s.pros)}</div>`:''}${s.contres?`<div class="c">👎 ${esc(s.contres)}</div>`:''}</div>`:''}
-        ${s.notes?`<small style="color:var(--muted)">📝 ${esc(s.notes)}</small>`:''}
-        ${s.link?`<a href="${esc(safeUrl(s.link))}" target="_blank" rel="noopener" style="font-weight:600;font-size:14px">Veure allotjament ↗</a>`:''}
-      </div>`;
-    }).join('')}</div></div>`;
-  }).join('');
-}
-
-/* =========================================================
    ASSEGURANÇA
    ========================================================= */
 const INS_FIELDS = [
@@ -812,7 +1008,7 @@ const INS_FIELDS = [
   {k:'link', label:'Enllaç', type:'url', full:true},
   {k:'notes', label:'Notes', type:'textarea', full:true},
 ];
-function editIns(id){ const it = id ? find('asseguranca', id) : {}; openForm(id ? 'Editar assegurança' : 'Nova opció 🛟', INS_FIELDS, it, x => commit('asseguranca', {op:'upsert', item:x})); }
+function editIns(id){ const it = id ? find('asseguranca', id) : {}; openForm(id ? 'Editar assegurança' : 'Nova opció 🛟', INS_FIELDS, it, x => commit('asseguranca', {op:'upsert', item:stamp(x, !id)})); }
 function chooseIns(id){
   (S.asseguranca||[]).forEach(i => { const want = i.id === id ? !i.escollida : false; if(!!i.escollida !== want) commit('asseguranca', {op:'upsert', item:{...i, escollida:want}}); });
 }
@@ -847,7 +1043,7 @@ const EXP_FIELDS = [
 ];
 const rate = () => +(S.config?.canvi) || 18500;
 const toEur = e => e.moneda === 'IDR' ? (+e.import||0) / rate() : (+e.import||0);
-function editExp(id){ const it = id ? find('despeses', id) : {moneda:'EUR', pagador:PEOPLE[0], categoria:'Menjar', data:new Date().toISOString().slice(0,10), entre:PEOPLE.slice()}; openForm(id ? 'Editar despesa' : 'Nova despesa 💸', EXP_FIELDS, it, x => { if(!x.entre.length) x.entre = PEOPLE.slice(); commit('despeses', {op:'upsert', item:x}); }); }
+function editExp(id){ const it = id ? find('despeses', id) : {moneda:'EUR', pagador:ME||PEOPLE[0], categoria:'Menjar', data:new Date().toISOString().slice(0,10), entre:PEOPLE.slice()}; openForm(id ? 'Editar despesa' : 'Nova despesa 💸', EXP_FIELDS, it, x => { if(!x.entre.length) x.entre = PEOPLE.slice(); commit('despeses', {op:'upsert', item:stamp(x, !id)}); }); }
 function renderExp(){
   const list = (S.despeses||[]).slice().sort((a,b) => (b.data||'').localeCompare(a.data||''));
   const el = document.getElementById('expList');
@@ -870,7 +1066,7 @@ function renderExp(){
   document.getElementById('expPP').textContent = total ? `≈ ${eur(total/3)} per persona` : '';
   document.getElementById('balances').innerHTML = PEOPLE.map(p => {
     const v = bal[p]; const cls = v > 0.005 ? 'pos' : v < -0.005 ? 'neg' : '';
-    return `<div class="bal"><span>${p}</span><span class="${cls}">${v > 0.005 ? '+' : ''}${eur(v)}</span></div>`;
+    return `<div class="bal"><span>${emo(p)} ${p}${p===ME?' <small>(tu)</small>':''}</span><span class="${cls}">${v > 0.005 ? '+' : ''}${eur(v)}</span></div>`;
   }).join('');
   // qui paga a qui (mínim de transferències)
   const cred = PEOPLE.filter(p => bal[p] > 0.005).map(p => ({p, v:bal[p]})).sort((a,b) => b.v - a.v);
@@ -916,7 +1112,7 @@ function renderCheck(){
   let tot = 0, ok = 0;
   list.forEach(it => { if(it.per === 'grup'){ tot++; if(it.done?.grup) ok++; } else PEOPLE.forEach(p => { tot++; if(it.done?.[p]) ok++; }); });
   const pct = tot ? Math.round(ok/tot*100) : 0;
-  const perP = PEOPLE.map(p => { const mine = list.filter(i => i.per !== 'grup'); const d = mine.filter(i => i.done?.[p]).length; return `${p} ${d}/${mine.length}`; }).join(' · ');
+  const perP = PEOPLE.map(p => { const mine = list.filter(i => i.per !== 'grup'); const d = mine.filter(i => i.done?.[p]).length; return `${p===ME?'<b>':''}${emo(p)} ${p} ${d}/${mine.length}${p===ME?'</b>':''}`; }).join(' · ');
   document.getElementById('checkProgress').innerHTML = `<div style="display:flex;justify-content:space-between;font-size:14px;color:var(--muted)"><span><b style="color:var(--jungle);font-size:20px">${pct}%</b> fet</span><span>${perP}</span></div><div class="progress"><div style="width:${pct}%"></div></div>`;
   const cats = [...new Set(list.map(i => i.cat))];
   const icons = {'Documentació':'🛂','Reserves':'📌','Maleta':'🎒','Altres':'✨'};
@@ -925,53 +1121,21 @@ function renderCheck(){
       <div class="txt">${esc(it.text)}${it.link?` <small><a href="${esc(safeUrl(it.link))}" target="_blank" rel="noopener">${esc(it.link.replace(/^https?:\/\//,''))} ↗</a></small>`:''}</div>
       <div class="who">${it.per === 'grup'
         ? `<button class="${it.done?.grup?'on':''}" onclick="toggleCheck('${it.id}','grup')">${it.done?.grup?'✓ Fet':'Pendent'}</button>`
-        : PEOPLE.map(p => `<button class="${it.done?.[p]?'on':''}" onclick="toggleCheck('${it.id}','${p}')">${it.done?.[p]?'✓ ':''}${p}</button>`).join('')}</div>
+        : PEOPLE.map(p => `<button class="${it.done?.[p]?'on':''} ${p===ME?'mine':''}" onclick="toggleCheck('${it.id}','${p}')">${it.done?.[p]?'✓ ':''}${p}</button>`).join('')}</div>
       <div style="white-space:nowrap"><button class="ico" onclick="editCheck('${it.id}')">✏️</button><button class="ico" onclick="del('checklist','${it.id}','aquest ítem')">🗑️</button></div>
     </div>`).join('')).join('');
 }
 
 /* =========================================================
-   RECOMANACIONS
-   ========================================================= */
-let recoZone = 'Totes', recoCat = 'Tot';
-const RECO_CATS = ['Visitar','Platja','Menjar','Festa','Experiència','Excursió','Compres'];
-const RECO_ICON = {'Visitar':'🛕','Platja':'🏖️','Menjar':'🍜','Festa':'🍹','Experiència':'🤿','Excursió':'🚤','Compres':'🛍️'};
-const RECO_FIELDS = [
-  {k:'nom', label:'Nom del lloc', full:true},
-  {k:'zona', label:'Zona', type:'select', opts:ZONES},
-  {k:'cat', label:'Tipus', type:'select', opts:RECO_CATS},
-  {k:'nota', label:'Per què val la pena', type:'textarea', full:true},
-  {k:'link', label:'Enllaç (opcional, si no es busca a Google Maps)', type:'url', full:true},
-];
-function editReco(id){ const it = id ? find('recos', id) : {zona: recoZone !== 'Totes' ? recoZone : 'Ubud', cat:'Visitar', fet:false}; openForm(id ? 'Editar lloc' : 'Nou lloc 🌺', RECO_FIELDS, it, x => commit('recos', {op:'upsert', item:x})); }
-function toggleReco(id){ const it = find('recos', id); commit('recos', {op:'upsert', item:{...it, fet:!it.fet}}); }
-function setRZ(z){ recoZone = z; renderRecos(); } function setRC(c){ recoCat = c; renderRecos(); }
-function renderRecos(){
-  const all = S.recos||[];
-  document.getElementById('recoZones').innerHTML = ['Totes', ...ZONES.filter(z => all.some(r => r.zona === z))].map(z => `<button class="chip ${recoZone===z?'on':''}" onclick="setRZ('${z}')">${ZONE_EMOJI[z]||'🌍'} ${z}</button>`).join('');
-  document.getElementById('recoCats').innerHTML = ['Tot', ...RECO_CATS.filter(c => all.some(r => r.cat === c))].map(c => `<button class="chip ${recoCat===c?'on':''}" onclick="setRC('${c}')">${RECO_ICON[c]||'✨'} ${c}</button>`).join('');
-  const list = all.filter(r => (recoZone === 'Totes' || r.zona === recoZone) && (recoCat === 'Tot' || r.cat === recoCat)).sort((a,b) => (a.fet?1:0) - (b.fet?1:0));
-  document.getElementById('recoList').innerHTML = list.length ? list.map(r => `<div class="reco ${r.fet?'fet':''}">
-    <div class="acts"><button class="ico" onclick="editReco('${r.id}')">✏️</button><button class="ico" onclick="del('recos','${r.id}','aquest lloc')">🗑️</button></div>
-    <div style="display:flex;gap:6px;flex-wrap:wrap"><span class="pill">${ZONE_EMOJI[r.zona]||'📍'} ${esc(r.zona)}</span><span class="pill" style="background:var(--sand)">${RECO_ICON[r.cat]||'✨'} ${esc(r.cat)}</span></div>
-    <h4>${esc(r.nom)}</h4>
-    <p>${esc(r.nota)}</p>
-    <div class="foot">
-      <a href="${esc(r.link ? safeUrl(r.link) : gmaps(r.nom + ' ' + (r.zona==='Altres'?'':r.zona) + ' Bali'))}" target="_blank" rel="noopener">📍 Veure al mapa ↗</a>
-      <button class="btn sm ${r.fet?'':'ghost'}" onclick="toggleReco('${r.id}')">${r.fet?'✓ Fet!':'Marcar com a fet'}</button>
-    </div>
-  </div>`).join('') : `<div class="empty" style="grid-column:1/-1">Res per aquí. Afegiu-hi els vostres descobriments 🌺</div>`;
-}
-
-/* =========================================================
    RENDER
    ========================================================= */
-const RENDER = {vols:()=>{renderVols();renderHero();}, allotjament:renderStay, asseguranca:renderIns, despeses:renderExp, checklist:renderCheck, recos:renderRecos, config:()=>{renderHero();renderExp();}};
+const RENDER = {vols:()=>{renderVols();renderHero();}, allotjament:renderDest, plans:renderDest, asseguranca:renderIns, despeses:renderExp, checklist:renderCheck, recos:renderDest, config:()=>{renderHero();renderExp();renderCheck();renderMe();}};
 function render(k){ RENDER[k] && RENDER[k](); }
 function renderAll(){ KEYS.forEach(render); }
 
-try{ initMap(); }catch(e){ document.getElementById('map').innerHTML = '<div class="empty" style="height:100%;display:grid;place-items:center">No s\'ha pogut carregar el mapa 🗺️</div>'; document.getElementById('places').innerHTML = POINTS.map(p => `<div class="place"><b>${p.e} ${p.nom}</b><small>${p.d}</small></div>`).join(''); }
-load();
+drawMap();
+renderMe();
+load().then(() => { if(!ME) openWho(); });
 </script>
 </body>
 </html>
