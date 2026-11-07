@@ -200,7 +200,10 @@ tr:last-child td{border-bottom:0}
 .pp .bar div{height:100%;background:linear-gradient(90deg,var(--leaf),var(--lime));border-radius:99px}
 .pp .cats{display:flex;gap:5px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
 .pp .cats span{background:var(--sage);border-radius:99px;padding:2px 8px}
-.settle{background:var(--white);border-radius:12px;padding:9px 12px;margin-top:8px;font-size:14px}
+.exp.pay .em{background:var(--sand)}
+.exp.pay b{color:var(--deep)}
+.settle .btn{margin-left:auto}
+.settle{display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:var(--white);border-radius:12px;padding:9px 12px;margin-top:8px;font-size:14px}
 .conv{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px}
 .conv input{width:120px;padding:7px 9px;border:1px solid var(--line);border-radius:10px}
 .total{font-family:Fraunces;font-size:32px;font-weight:800;color:var(--jungle)}
@@ -355,7 +358,7 @@ footer{text-align:center;color:var(--muted);font-size:14px;padding:30px 10px 50p
 
 <!-- DESPESES -->
 <section class="card" id="despeses">
-  <div class="sh"><div><h2>Despeses 💸</h2><p>Qui ha pagat què i qui deu a qui. Sense drames.</p></div><button class="btn" onclick="editExp()">+ Afegir despesa</button></div>
+  <div class="sh"><div><h2>Despeses 💸</h2><p>Qui ha pagat què i qui deu a qui. Sense drames.</p></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn ghost" onclick="editPay()">↔️ Registrar pagament</button><button class="btn" onclick="editExp()">+ Afegir despesa</button></div></div>
   <div class="expgrid">
     <div><div id="expList"></div></div>
     <div style="display:flex;flex-direction:column;gap:14px">
@@ -1053,10 +1056,35 @@ const EXP_FIELDS = [
 const rate = () => +(S.config?.canvi) || 18500;
 const toEur = e => e.moneda === 'IDR' ? (+e.import||0) / rate() : (+e.import||0);
 function editExp(id){ const it = id ? find('despeses', id) : {moneda:'EUR', pagador:ME||PEOPLE[0], categoria:'Menjar', data:new Date().toISOString().slice(0,10), entre:PEOPLE.slice()}; openForm(id ? 'Editar despesa' : 'Nova despesa 💸', EXP_FIELDS, it, x => { if(!x.entre.length) x.entre = PEOPLE.slice(); commit('despeses', {op:'upsert', item:stamp(x, !id)}); }); }
+const PAY_FIELDS = [
+  {k:'pagador', label:'Qui paga', type:'select', opts:PEOPLE},
+  {k:'a', label:'A qui', type:'select', opts:PEOPLE},
+  {k:'import', label:'Import', type:'number'},
+  {k:'moneda', label:'Moneda', type:'select', opts:['EUR','IDR']},
+  {k:'data', label:'Data', type:'date'},
+  {k:'concepte', label:'Nota (opcional)', ph:'Bizum del sopar'},
+];
+const today = () => new Date().toISOString().slice(0,10);
+function editPay(id, pre){
+  const it = id ? find('despeses', id) : {tipus:'pagament', moneda:'EUR', pagador:ME||PEOPLE[0], a:PEOPLE.find(p => p !== (ME||PEOPLE[0])), data:today(), ...(pre||{})};
+  openForm(id ? 'Editar pagament' : 'Registrar pagament ↔️', PAY_FIELDS, it, x => {
+    if(x.pagador === x.a){ alert('Qui paga i qui rep han de ser persones diferents 🙂'); return; }
+    x.tipus = 'pagament'; commit('despeses', {op:'upsert', item:stamp(x, !id)});
+  });
+}
+function settleNow(from, to, amt){
+  if(confirm(`Marcar que ${from} ha pagat ${eur(amt)} a ${to}?`)) commit('despeses', {op:'upsert', item:stamp({id:uid(), tipus:'pagament', pagador:from, a:to, import:Math.round(amt*100)/100, moneda:'EUR', data:today(), concepte:''}, true)});
+}
+const isPay = e => e.tipus === 'pagament';
 function renderExp(){
   const list = (S.despeses||[]).slice().sort((a,b) => (b.data||'').localeCompare(a.data||''));
   const el = document.getElementById('expList');
-  el.innerHTML = list.length ? list.map(e => `<div class="exp">
+  el.innerHTML = list.length ? list.map(e => isPay(e) ? `<div class="exp pay">
+    <div class="em">↔️</div>
+    <div><b>${emo(e.pagador)} ${esc(e.pagador)} → ${emo(e.a)} ${esc(e.a)}</b><br><small>Pagament per quadrar comptes${e.concepte?' · '+esc(e.concepte):''}${e.data?' · '+fmtDate(e.data):''}</small></div>
+    <div class="amt" style="color:var(--palm)">${eur(toEur(e))}${e.moneda==='IDR'?`<br><small>${idr(e.import)}</small>`:''}</div>
+    <div style="white-space:nowrap"><button class="ico" onclick="editPay('${e.id}')">✏️</button><button class="ico" onclick="del('despeses','${e.id}','aquest pagament')">🗑️</button></div>
+  </div>` : `<div class="exp">
     <div class="em">${CATS[e.categoria]||'✨'}</div>
     <div><b>${esc(e.concepte||'Despesa')}</b><br><small>${esc(e.pagador)} ha pagat · ${(e.entre||PEOPLE).length===3?'entre les 3':'entre '+esc((e.entre||[]).join(' i '))}${e.data?' · '+fmtDate(e.data):''}</small></div>
     <div class="amt">${eur(toEur(e))}${e.moneda==='IDR'?`<br><small>${idr(e.import)}</small>`:''}</div>
@@ -1069,6 +1097,7 @@ function renderExp(){
   const byCat = Object.fromEntries(PEOPLE.map(p => [p, {}]));
   let total = 0;
   list.forEach(e => {
+    if(isPay(e)){ const a = toEur(e); if(bal[e.pagador] !== undefined) bal[e.pagador] += a; if(bal[e.a] !== undefined) bal[e.a] -= a; return; }
     const a = toEur(e); total += a;
     const who = (e.entre && e.entre.length) ? e.entre : PEOPLE;
     if(bal[e.pagador] !== undefined){ bal[e.pagador] += a; paid[e.pagador] += a; }
@@ -1095,11 +1124,11 @@ function renderExp(){
   let i = 0, j = 0;
   while(i < debt.length && j < cred.length){
     const x = Math.min(debt[i].v, cred[j].v);
-    tx.push(`💸 <b>${debt[i].p}</b> → <b>${cred[j].p}</b>: ${eur(x)}`);
+    tx.push(`<span>💸 <b>${debt[i].p}</b> → <b>${cred[j].p}</b>: ${eur(x)}</span><button class="btn sm" onclick="settleNow('${debt[i].p}','${cred[j].p}',${x.toFixed(2)})">✓ Pagat</button>`);
     debt[i].v -= x; cred[j].v -= x;
     if(debt[i].v < 0.005) i++; if(cred[j].v < 0.005) j++;
   }
-  document.getElementById('settle').innerHTML = tx.length ? tx.map(t => `<div class="settle">${t}</div>`).join('') : (total ? '<div class="settle">✨ Esteu en paus!</div>' : '');
+  document.getElementById('settle').innerHTML = tx.length ? tx.map(t => `<div class="settle">${t}</div>`).join('') : (list.length ? '<div class="settle">✨ Esteu en paus!</div>' : '');
   const r = document.getElementById('rate'); if(document.activeElement !== r) r.value = rate();
   convUpdate();
 }
