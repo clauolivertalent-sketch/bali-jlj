@@ -192,6 +192,14 @@ tr:last-child td{border-bottom:0}
 .panel h3{font-size:20px;color:var(--jungle);margin-bottom:10px}
 .bal{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px dashed var(--mint);font-variant-numeric:tabular-nums}
 .bal .pos{color:var(--palm);font-weight:700} .bal .neg{color:#b1532f;font-weight:700}
+.pp{background:var(--white);border-radius:14px;padding:12px 14px;margin-bottom:8px}
+.pp.yo{outline:2px solid var(--lime)}
+.pp .top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.pp .top b{font-family:Fraunces;font-size:24px;color:var(--jungle)}
+.pp .bar{height:8px;border-radius:99px;background:var(--sage);overflow:hidden;margin:6px 0}
+.pp .bar div{height:100%;background:linear-gradient(90deg,var(--leaf),var(--lime));border-radius:99px}
+.pp .cats{display:flex;gap:5px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+.pp .cats span{background:var(--sage);border-radius:99px;padding:2px 8px}
 .settle{background:var(--white);border-radius:12px;padding:9px 12px;margin-top:8px;font-size:14px}
 .conv{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px}
 .conv input{width:120px;padding:7px 9px;border:1px solid var(--line);border-radius:10px}
@@ -352,6 +360,7 @@ footer{text-align:center;color:var(--muted);font-size:14px;padding:30px 10px 50p
     <div><div id="expList"></div></div>
     <div style="display:flex;flex-direction:column;gap:14px">
       <div class="panel"><h3>Total del viatge</h3><div class="total" id="expTotal">0 €</div><small id="expPP" style="color:var(--muted)"></small></div>
+      <div class="panel"><h3>Què porta gastat cada una</h3><div id="perPerson"></div></div>
       <div class="panel"><h3>Balanç</h3><div id="balances"></div><div id="settle"></div></div>
       <div class="panel"><h3>Conversor ràpid 💱</h3>
         <div class="conv"><input type="number" id="cvEur" placeholder="€"> € = <b id="cvIdrOut">—</b></div>
@@ -1055,13 +1064,24 @@ function renderExp(){
   </div>`).join('') : `<div class="empty">Encara cap despesa. Quan algú pagui per totes, apunteu-ho aquí 💸</div>`;
 
   const bal = Object.fromEntries(PEOPLE.map(p => [p, 0]));
+  const share = Object.fromEntries(PEOPLE.map(p => [p, 0]));
+  const paid = Object.fromEntries(PEOPLE.map(p => [p, 0]));
+  const byCat = Object.fromEntries(PEOPLE.map(p => [p, {}]));
   let total = 0;
   list.forEach(e => {
     const a = toEur(e); total += a;
     const who = (e.entre && e.entre.length) ? e.entre : PEOPLE;
-    if(bal[e.pagador] !== undefined) bal[e.pagador] += a;
-    who.forEach(p => { if(bal[p] !== undefined) bal[p] -= a / who.length; });
+    if(bal[e.pagador] !== undefined){ bal[e.pagador] += a; paid[e.pagador] += a; }
+    who.forEach(p => { if(bal[p] === undefined) return; const part = a / who.length; bal[p] -= part; share[p] += part; byCat[p][e.categoria] = (byCat[p][e.categoria]||0) + part; });
   });
+  const maxShare = Math.max(...PEOPLE.map(p => share[p]), 1);
+  document.getElementById('perPerson').innerHTML = total ? PEOPLE.slice().sort((a,b) => (b===ME) - (a===ME)).map(p => `<div class="pp ${p===ME?'yo':''}">
+      <div class="top"><span>${emo(p)} <b>${eur(share[p])}</b></span><span style="font-weight:600">${p}${p===ME?' <small style="color:var(--muted)">(tu)</small>':''}</span></div>
+      <div class="bar"><div style="width:${share[p]/maxShare*100}%"></div></div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:5px">Ha avançat ${eur(paid[p])} de la seva butxaca</div>
+      <div class="cats">${Object.entries(byCat[p]).sort((a,b) => b[1]-a[1]).map(([c,v]) => `<span>${CATS[c]||'✨'} ${eur(v)}</span>`).join('')}</div>
+    </div>`).join('') + '<small style="color:var(--muted)">És la part que li toca de cada despesa on participa, pagui qui pagui.</small>'
+    : '<small style="color:var(--muted)">Quan afegiu despeses, aquí veureu el que porta gastat cada una.</small>';
   document.getElementById('expTotal').textContent = eur(total);
   document.getElementById('expPP').textContent = total ? `≈ ${eur(total/3)} per persona` : '';
   document.getElementById('balances').innerHTML = PEOPLE.map(p => {
