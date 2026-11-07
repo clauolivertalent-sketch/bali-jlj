@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bali · Jana, Júlia & Laura 🌴</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌴</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,800;1,9..144,500;1,9..144,700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+:root{
+  --jungle:#0c3528; --deep:#12503a; --palm:#1d7a50; --leaf:#46a876; --mint:#bfe5c8;
+  --sage:#e4f1e2; --cream:#f7f5ec; --lime:#d5ec7c; --lagoon:#37b8a6; --coral:#ef8a6b;
+  --sand:#f2e5c6; --ink:#14271f; --muted:#5d7569; --line:#d6e6d6; --white:#fffef9;
+  --r:22px; --shadow:0 10px 30px -14px rgba(12,53,40,.35);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:76px}
+body{margin:0;font-family:Outfit,system-ui,sans-serif;color:var(--ink);background:var(--cream);font-size:16px;line-height:1.5;
+  background-image:radial-gradient(circle at 10% 20%,rgba(70,168,118,.07) 0 180px,transparent 181px),radial-gradient(circle at 90% 60%,rgba(55,184,166,.07) 0 220px,transparent 221px);}
+h1,h2,h3{font-family:Fraunces,Georgia,serif;margin:0;line-height:1.1}
+a{color:var(--palm)}
+button{font-family:inherit;cursor:pointer}
+input,select,textarea{font-family:inherit;font-size:15px}
+
+/* NAV */
+nav.top{position:sticky;top:0;z-index:1000;background:rgba(247,245,236,.88);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.navin{max-width:1180px;margin:0 auto;display:flex;align-items:center;gap:14px;padding:8px 18px}
+.brand{display:flex;align-items:center;gap:8px;font-family:Fraunces;font-weight:800;font-size:20px;color:var(--jungle);text-decoration:none;white-space:nowrap}
+.brand svg{width:46px;height:30px}
+.links{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;flex:1}
+.links::-webkit-scrollbar{display:none}
+.links a{white-space:nowrap;text-decoration:none;color:var(--deep);font-weight:500;font-size:14px;padding:7px 12px;border-radius:99px}
+.links a:hover{background:var(--sage)}
+.sync{font-size:12px;padding:5px 10px;border-radius:99px;background:var(--sage);color:var(--deep);white-space:nowrap}
+.sync.err{background:#fde3da;color:#9a3b1d}
+
+/* HERO */
+.hero{position:relative;overflow:hidden;background:linear-gradient(160deg,var(--jungle) 0%,var(--deep) 55%,var(--palm) 100%);color:var(--cream)}
+.hero .leaves{position:absolute;inset:0;pointer-events:none;opacity:.18}
+.heroin{position:relative;max-width:1180px;margin:0 auto;padding:46px 22px 70px;display:grid;grid-template-columns:1.2fr .8fr;gap:30px;align-items:center}
+.hero .logo-big{width:230px;max-width:70%;filter:drop-shadow(0 12px 24px rgba(0,0,0,.25))}
+.hero h1{font-size:clamp(64px,11vw,130px);font-weight:800;font-style:italic;letter-spacing:-2px;color:var(--lime);margin-top:6px}
+.hero .names{font-size:20px;letter-spacing:3px;text-transform:uppercase;color:var(--mint);font-weight:500}
+.count{display:flex;gap:12px;margin-top:22px;flex-wrap:wrap}
+.count .box{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:16px;padding:10px 16px;text-align:center;min-width:78px}
+.count .n{font-family:Fraunces;font-size:34px;font-weight:800;color:var(--white);line-height:1}
+.count .l{font-size:12px;color:var(--mint);text-transform:uppercase;letter-spacing:1px}
+.dates{margin-top:16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:14px;color:var(--mint)}
+.dates input{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:var(--white);border-radius:10px;padding:6px 8px;color-scheme:dark}
+.polaroid{background:var(--white);padding:12px 12px 44px;border-radius:6px;transform:rotate(3deg);box-shadow:0 24px 50px -18px rgba(0,0,0,.55);position:relative;justify-self:center;max-width:380px}
+.polaroid img{width:100%;display:block;border-radius:3px}
+.polaroid span{position:absolute;bottom:10px;left:0;right:0;text-align:center;font-family:Fraunces;font-style:italic;color:var(--deep);font-size:20px}
+.wave{position:absolute;bottom:-1px;left:0;width:100%;height:60px}
+
+/* SECTIONS */
+main{max-width:1180px;margin:0 auto;padding:10px 18px 80px}
+section.card{background:var(--white);border:1px solid var(--line);border-radius:var(--r);padding:28px;margin-top:28px;box-shadow:var(--shadow)}
+.sh{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.sh h2{font-size:34px;color:var(--jungle);font-weight:800}
+.sh h2 em{color:var(--palm);font-weight:500}
+.sh p{margin:4px 0 0;color:var(--muted)}
+.btn{border:0;background:var(--palm);color:var(--white);padding:10px 18px;border-radius:99px;font-weight:600;font-size:14px;transition:.15s}
+.btn:hover{background:var(--deep);transform:translateY(-1px)}
+.btn.ghost{background:var(--sage);color:var(--deep)}
+.btn.ghost:hover{background:var(--mint)}
+.btn.sm{padding:6px 12px;font-size:13px}
+.ico{border:0;background:transparent;font-size:16px;padding:4px 6px;border-radius:8px;opacity:.6}
+.ico:hover{opacity:1;background:var(--sage)}
+.empty{border:2px dashed var(--line);border-radius:16px;padding:26px;text-align:center;color:var(--muted)}
+.tip{background:var(--sage);border-left:4px solid var(--leaf);border-radius:12px;padding:12px 16px;font-size:14px;margin-top:16px}
+.tip b{color:var(--deep)}
+.pill{display:inline-block;font-size:12px;padding:3px 10px;border-radius:99px;background:var(--sage);color:var(--deep);font-weight:600}
+.pill.ok{background:var(--palm);color:#fff}
+.pill.no{background:#eee;color:#888;text-decoration:line-through}
+.pill.lime{background:var(--lime);color:var(--jungle)}
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
+.g3{grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+.chip{border:1px solid var(--line);background:var(--white);padding:6px 14px;border-radius:99px;font-size:13px;font-weight:500;color:var(--deep)}
+.chip.on{background:var(--deep);color:var(--white);border-color:var(--deep)}
+
+/* MAP */
+.mapwrap{display:grid;grid-template-columns:1fr 300px;gap:18px}
+#map{height:470px;border-radius:18px;border:1px solid var(--line);z-index:1}
+.places{display:flex;flex-direction:column;gap:8px;max-height:470px;overflow:auto}
+.place{border:1px solid var(--line);border-radius:14px;padding:10px 14px;cursor:pointer;transition:.15s;background:var(--white)}
+.place:hover{border-color:var(--leaf);background:var(--sage)}
+.place b{font-family:Fraunces;font-size:17px;color:var(--jungle)}
+.place small{display:block;color:var(--muted);font-size:13px;line-height:1.35}
+.pin{width:34px;height:34px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:var(--palm);border:3px solid var(--white);box-shadow:0 4px 10px rgba(0,0,0,.3);display:grid;place-items:center}
+.pin span{transform:rotate(45deg);font-size:15px}
+.pin.small{width:24px;height:24px;background:var(--lagoon)}
+.pin.small span{font-size:11px}
+.leaflet-popup-content{font-family:Outfit}
+.leaflet-popup-content b{font-family:Fraunces;font-size:16px;color:var(--jungle)}
+
+/* CLOCKS */
+.clocks{display:grid;grid-template-columns:1fr auto 1fr;gap:20px;align-items:center}
+.clock{text-align:center;background:linear-gradient(160deg,var(--sage),var(--white));border:1px solid var(--line);border-radius:20px;padding:22px}
+.clock svg{width:150px;height:150px}
+.clock .city{font-family:Fraunces;font-size:24px;font-weight:800;color:var(--jungle);margin-top:6px}
+.clock .dig{font-size:32px;font-weight:600;color:var(--deep);font-variant-numeric:tabular-nums}
+.clock .day{color:var(--muted);font-size:14px}
+.diff{text-align:center}
+.diff .big{font-family:Fraunces;font-weight:800;font-size:46px;color:var(--palm)}
+.diff small{color:var(--muted);display:block;max-width:170px}
+.callok{margin-top:10px;font-size:14px;font-weight:600}
+
+/* FLIGHTS */
+.flight{display:grid;grid-template-columns:auto 1fr auto;gap:16px;align-items:center;border:1px solid var(--line);border-radius:18px;padding:16px 18px;background:var(--white);margin-bottom:12px}
+.flight .tag{writing-mode:vertical-rl;transform:rotate(180deg);font-weight:700;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--white);background:var(--palm);border-radius:10px;padding:10px 6px;text-align:center}
+.flight .tag.tornada{background:var(--coral)}
+.flight .tag.intern{background:var(--lagoon)}
+.route{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.route .ap{font-family:Fraunces;font-size:30px;font-weight:800;color:var(--jungle);line-height:1}
+.route .t{font-size:14px;color:var(--muted)}
+.route .line{flex:1;min-width:60px;height:2px;background:repeating-linear-gradient(90deg,var(--leaf) 0 6px,transparent 6px 12px);position:relative}
+.route .line:after{content:"✈️";position:absolute;left:50%;top:-12px;transform:translateX(-50%);font-size:16px}
+.fmeta{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px;font-size:13px;color:var(--muted)}
+.fmeta b{color:var(--ink)}
+
+/* STAY */
+.zone{margin-bottom:22px}
+.zone h3{font-size:22px;color:var(--deep);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.stay{border:1px solid var(--line);border-radius:18px;padding:16px;background:var(--white);display:flex;flex-direction:column;gap:8px;position:relative}
+.stay.res{border:2px solid var(--palm);background:linear-gradient(170deg,#eef8ee,var(--white))}
+.stay.desc{opacity:.55}
+.stay h4{margin:0;font-family:Fraunces;font-size:19px;color:var(--jungle);padding-right:60px}
+.stay .acts{position:absolute;top:10px;right:10px}
+.prices{display:flex;gap:8px;flex-wrap:wrap}
+.prices div{background:var(--sage);border-radius:10px;padding:6px 10px;font-size:12px;color:var(--muted)}
+.prices b{display:block;font-size:17px;color:var(--jungle)}
+.stars{color:#e8b021;letter-spacing:1px}
+.pc{font-size:13px;line-height:1.4}
+.pc .p{color:var(--palm)} .pc .c{color:#b1532f}
+
+/* TABLE */
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:16px}
+table{border-collapse:collapse;width:100%;min-width:820px;font-size:14px}
+th,td{padding:11px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:var(--sage);color:var(--deep);font-weight:600;font-size:13px;white-space:nowrap}
+tr.chosen td{background:#eaf7e8}
+tr:last-child td{border-bottom:0}
+
+/* EXPENSES */
+.expgrid{display:grid;grid-template-columns:1.3fr 1fr;gap:20px}
+.exp{display:grid;grid-template-columns:auto 1fr auto auto;gap:12px;align-items:center;padding:10px 4px;border-bottom:1px solid var(--line)}
+.exp .em{font-size:22px;width:40px;height:40px;border-radius:12px;background:var(--sage);display:grid;place-items:center}
+.exp .amt{font-weight:700;font-variant-numeric:tabular-nums;text-align:right}
+.exp small{color:var(--muted)}
+.panel{background:var(--sage);border-radius:18px;padding:18px}
+.panel h3{font-size:20px;color:var(--jungle);margin-bottom:10px}
+.bal{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px dashed var(--mint);font-variant-numeric:tabular-nums}
+.bal .pos{color:var(--palm);font-weight:700} .bal .neg{color:#b1532f;font-weight:700}
+.settle{background:var(--white);border-radius:12px;padding:9px 12px;margin-top:8px;font-size:14px}
+.conv{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px}
+.conv input{width:120px;padding:7px 9px;border:1px solid var(--line);border-radius:10px}
+.total{font-family:Fraunces;font-size:32px;font-weight:800;color:var(--jungle)}
+
+/* CHECKLIST */
+.cl h3{font-size:20px;color:var(--deep);margin:18px 0 8px}
+.ci{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;padding:9px 12px;border-radius:12px;border:1px solid var(--line);margin-bottom:6px;background:var(--white)}
+.ci.done{background:#eef8ee}
+.ci.done .txt{color:var(--muted);text-decoration:line-through}
+.ci .txt small{display:block;font-size:12px}
+.who{display:flex;gap:5px}
+.who button{border:1px solid var(--line);background:var(--white);border-radius:99px;padding:4px 10px;font-size:12px;font-weight:600;color:var(--muted)}
+.who button.on{background:var(--palm);border-color:var(--palm);color:#fff}
+.progress{height:10px;border-radius:99px;background:var(--sage);overflow:hidden;margin-top:6px}
+.progress div{height:100%;background:linear-gradient(90deg,var(--leaf),var(--lime));transition:.4s}
+
+/* RECOS */
+.reco{border:1px solid var(--line);border-radius:18px;padding:14px 16px;background:var(--white);display:flex;flex-direction:column;gap:6px;position:relative}
+.reco.fet{background:#eef8ee}
+.reco h4{margin:0;font-family:Fraunces;font-size:18px;color:var(--jungle);padding-right:54px}
+.reco p{margin:0;font-size:14px;color:#3d5449}
+.reco .acts{position:absolute;top:8px;right:8px}
+.reco .foot{display:flex;justify-content:space-between;align-items:center;margin-top:auto;padding-top:6px;gap:6px;flex-wrap:wrap}
+.reco a{font-size:13px;font-weight:600;text-decoration:none}
+
+/* MODAL */
+.modal{position:fixed;inset:0;background:rgba(12,53,40,.55);backdrop-filter:blur(4px);z-index:2000;display:none;align-items:flex-start;justify-content:center;padding:40px 14px;overflow:auto}
+.modal.open{display:flex}
+.mbox{background:var(--white);border-radius:22px;max-width:620px;width:100%;padding:24px;box-shadow:0 30px 60px -20px rgba(0,0,0,.5)}
+.mbox h3{font-size:26px;color:var(--jungle);margin-bottom:16px}
+.form{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form label{display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:600;color:var(--deep)}
+.form label.full{grid-column:1/-1}
+.form input,.form select,.form textarea{border:1px solid var(--line);border-radius:12px;padding:9px 11px;background:var(--cream);font-weight:400;color:var(--ink)}
+.form input:focus,.form select:focus,.form textarea:focus{outline:2px solid var(--leaf);border-color:transparent}
+.form textarea{min-height:70px;resize:vertical}
+.ppl{display:flex;gap:8px;flex-wrap:wrap}
+.ppl label{flex-direction:row;align-items:center;gap:5px;font-weight:500;background:var(--sage);padding:6px 10px;border-radius:99px}
+.mact{display:flex;justify-content:flex-end;gap:10px;margin-top:18px}
+
+footer{text-align:center;color:var(--muted);font-size:14px;padding:30px 10px 50px}
+
+/* LOGO ANIMATION */
+.logo .hd{transform-box:fill-box;transform-origin:50% 100%;animation:bob 3.2s ease-in-out infinite}
+.logo .hd.d2{animation-delay:.4s} .logo .hd.d3{animation-delay:.8s}
+.logo .blink{transform-box:fill-box;transform-origin:center;animation:blink 4.5s infinite}
+.logo .leafL{transform-box:fill-box;transform-origin:100% 100%;animation:sway 4s ease-in-out infinite}
+.logo .leafR{transform-box:fill-box;transform-origin:0% 100%;animation:sway 4.6s ease-in-out infinite reverse}
+.logo .sun{transform-box:fill-box;transform-origin:center;animation:spin 18s linear infinite}
+.logo .wv{animation:wave 3s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-3px) rotate(-2deg)}}
+@keyframes blink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.1)}}
+@keyframes sway{0%,100%{transform:rotate(0)}50%{transform:rotate(6deg)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes wave{0%,100%{transform:translateX(0)}50%{transform:translateX(-6px)}}
+@media (prefers-reduced-motion:reduce){.logo *{animation:none!important}}
+
+@media (max-width:860px){
+  .heroin{grid-template-columns:1fr;padding-top:30px}
+  .polaroid{max-width:300px}
+  .mapwrap,.expgrid{grid-template-columns:1fr}
+  .places{max-height:none}
+  #map{height:380px}
+  .clocks{grid-template-columns:1fr}
+  section.card{padding:20px}
+  .form{grid-template-columns:1fr}
+  .sh h2{font-size:28px}
+  .sync .st{display:none}
+  .brand{font-size:0;gap:0}
+}
+</style>
+</head>
+<body>
+
+<nav class="top">
+  <div class="navin">
+    <a class="brand" href="#inici"><span id="logoSmall"></span>Bali</a>
+    <div class="links">
+      <a href="#mapa">🗺️ Mapa</a><a href="#hora">🕰️ Hora</a><a href="#vols">✈️ Vols</a><a href="#allotjament">🏡 Allotjament</a>
+      <a href="#asseguranca">🛟 Assegurança</a><a href="#despeses">💸 Despeses</a><a href="#checklist">✅ Checklist</a><a href="#recos">🌺 Recomanacions</a>
+    </div>
+    <span class="sync" id="sync">Carregant…</span>
+  </div>
+</nav>
+
+<header class="hero" id="inici">
+  <svg class="leaves" viewBox="0 0 1200 500" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <g fill="#d5ec7c">
+      <path d="M-40 120 C 80 60 180 90 260 180 C 160 170 60 190 -40 240 Z"/>
+      <path d="M-30 300 C 90 250 200 280 280 360 C 180 360 70 380 -30 430 Z"/>
+      <path d="M1240 60 C 1110 30 1000 70 930 160 C 1030 150 1140 160 1240 210 Z"/>
+      <path d="M1240 300 C 1120 270 1010 300 950 380 C 1050 380 1150 390 1240 440 Z"/>
+      <circle cx="1040" cy="420" r="70" opacity=".4"/>
+    </g>
+  </svg>
+  <div class="heroin">
+    <div>
+      <div id="logoBig"></div>
+      <h1>Bali</h1>
+      <div class="names">Jana · Júlia · Laura</div>
+      <div class="count" id="count"></div>
+      <div class="dates">
+        📅 Del <input type="date" id="dIni"> al <input type="date" id="dFi">
+      </div>
+    </div>
+    <div class="polaroid"><img src="img/grup.jpg" alt="Les tres a Bali"><span>Terima kasih, Bali 🌺</span></div>
+  </div>
+  <svg class="wave" viewBox="0 0 1200 60" preserveAspectRatio="none"><path d="M0 30 C 200 60 400 0 600 30 C 800 60 1000 0 1200 30 L1200 60 L0 60 Z" fill="#f7f5ec"/></svg>
+</header>
+
+<main>
+
+<!-- MAPA -->
+<section class="card" id="mapa">
+  <div class="sh"><div><h2>El mapa <em>de l'illa</em></h2><p>Toca un punt de la llista per anar-hi directe.</p></div></div>
+  <div class="mapwrap">
+    <div id="map"></div>
+    <div class="places" id="places"></div>
+  </div>
+</section>
+
+<!-- HORA -->
+<section class="card" id="hora">
+  <div class="sh"><div><h2>Bali <em>vs</em> Barcelona</h2><p>Per saber quan trucar a casa sense despertar ningú.</p></div></div>
+  <div class="clocks">
+    <div class="clock"><svg viewBox="0 0 100 100" id="clkBali"></svg><div class="city">🌴 Bali</div><div class="dig" id="digBali"></div><div class="day" id="dayBali"></div></div>
+    <div class="diff"><div class="big" id="diffH"></div><small id="diffTxt"></small><div class="callok" id="callok"></div></div>
+    <div class="clock"><svg viewBox="0 0 100 100" id="clkBcn"></svg><div class="city">🏙️ Barcelona</div><div class="dig" id="digBcn"></div><div class="day" id="dayBcn"></div></div>
+  </div>
+</section>
+
+<!-- VOLS -->
+<section class="card" id="vols">
+  <div class="sh"><div><h2>Els vols ✈️</h2><p>Tota la info dels bitllets en un sol lloc.</p></div><button class="btn" onclick="editVol()">+ Afegir vol</button></div>
+  <div id="volsList"></div>
+</section>
+
+<!-- ALLOTJAMENT -->
+<section class="card" id="allotjament">
+  <div class="sh"><div><h2>Allotjament 🏡</h2><p>Afegiu opcions per zona, compareu preus i marqueu les reservades.</p></div><button class="btn" onclick="editStay()">+ Afegir allotjament</button></div>
+  <div class="chips" id="stayChips"></div>
+  <div id="stayList"></div>
+</section>
+
+<!-- ASSEGURANÇA -->
+<section class="card" id="asseguranca">
+  <div class="sh"><div><h2>Assegurança 🛟</h2><p>Comparador d'opcions. Marqueu amb ⭐ la que contracteu.</p></div><button class="btn" onclick="editIns()">+ Afegir opció</button></div>
+  <div class="tw"><table><thead><tr><th></th><th>Companyia</th><th>Preu/persona</th><th>Despeses mèdiques</th><th>Cancel·lació</th><th>Equipatge</th><th>Moto / esports</th><th>Franquícia</th><th>Valoració</th><th>Notes</th><th></th></tr></thead><tbody id="insBody"></tbody></table></div>
+  <div class="tip"><b>💡 Què mirar:</b> que cobreixi l'assistència mèdica amb un import alt (Indonèsia queda lluny i una evacuació surt caríssima), la cancel·lació i, si penseu llogar moto, que inclogui la conducció de moto. Moltes pòlisses només la cobreixen si porteu el carnet internacional i el casc posat.</div>
+</section>
+
+<!-- DESPESES -->
+<section class="card" id="despeses">
+  <div class="sh"><div><h2>Despeses 💸</h2><p>Qui ha pagat què i qui deu a qui. Sense drames.</p></div><button class="btn" onclick="editExp()">+ Afegir despesa</button></div>
+  <div class="expgrid">
+    <div><div id="expList"></div></div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div class="panel"><h3>Total del viatge</h3><div class="total" id="expTotal">0 €</div><small id="expPP" style="color:var(--muted)"></small></div>
+      <div class="panel"><h3>Balanç</h3><div id="balances"></div><div id="settle"></div></div>
+      <div class="panel"><h3>Conversor ràpid 💱</h3>
+        <div class="conv"><input type="number" id="cvEur" placeholder="€"> € = <b id="cvIdrOut">—</b></div>
+        <div class="conv"><input type="number" id="cvIdr" placeholder="IDR"> IDR = <b id="cvEurOut">—</b></div>
+        <div class="conv" style="font-size:13px;color:var(--muted)">Canvi: 1 € = <input type="number" id="rate" style="width:100px"> IDR <small>(actualitzeu-lo abans de marxar)</small></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CHECKLIST -->
+<section class="card cl" id="checklist">
+  <div class="sh"><div><h2>Checklist ✅</h2><p>Cadascuna marca el seu. Les reserves són de grup.</p></div><button class="btn" onclick="editCheck()">+ Afegir ítem</button></div>
+  <div id="checkProgress"></div>
+  <div id="checkList"></div>
+  <div class="tip"><b>⚠️ Ull amb les estafes:</b> el visat, la targeta d'arribada i la taxa turística feu-los només a webs oficials acabades en <b>.go.id</b>. Hi ha moltes webs que cobren de més pel mateix tràmit.</div>
+</section>
+
+<!-- RECOMANACIONS -->
+<section class="card" id="recos">
+  <div class="sh"><div><h2>Recomanacions 🌺</h2><p>Llocs que valen la pena. Marqueu-los com a fets i afegiu els vostres descobriments.</p></div><button class="btn" onclick="editReco()">+ Afegir lloc</button></div>
+  <div class="chips" id="recoZones"></div>
+  <div class="chips" id="recoCats" style="margin-top:-8px"></div>
+  <div class="grid g3" id="recoList"></div>
+</section>
+
+</main>
+
+<footer>Fet amb 💚 per al viatge de la Jana, la Júlia i la Laura · Selamat jalan!</footer>
+
+<div class="modal" id="modal"><div class="mbox"><h3 id="mTitle"></h3><form id="mForm" class="form"></form><div class="mact"><button class="btn ghost" onclick="closeModal()">Cancel·la</button><button class="btn" id="mSave">Desa</button></div></div></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+/* =========================================================
+   CONFIG
+   ========================================================= */
+const PEOPLE = ['Jana','Júlia','Laura'];
+const KEYS = ['vols','allotjament','asseguranca','despeses','checklist','recos','config'];
+const API = '/api/data';
+const LS = 'bali-jjl-v1';
+const ZONES = ['Ubud','Uluwatu','Canggu','Gili T','Seminyak','Altres'];
+const ZONE_EMOJI = {'Ubud':'🌿','Uluwatu':'🌊','Canggu':'🏄‍♀️','Gili T':'🐢','Seminyak':'🍹','Altres':'📍'};
+
+const uid = () => Math.random().toString(36).slice(2,9) + Date.now().toString(36).slice(-4);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const safeUrl = u => { u = String(u||'').trim(); if(!u) return ''; if(!/^https?:\/\//i.test(u)) u = 'https://' + u; return u; };
+const eur = n => (Math.round((n||0)*100)/100).toLocaleString('ca-ES',{minimumFractionDigits:2,maximumFractionDigits:2}) + ' €';
+const idr = n => Math.round(n||0).toLocaleString('ca-ES') + ' IDR';
+const gmaps = (q) => 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(q);
+
+/* =========================================================
+   DEFAULTS (contingut inicial)
+   ========================================================= */
+const DEFAULTS = {
+  vols: () => [],
+  allotjament: () => [],
+  despeses: () => [],
+  config: () => ({ inici:'', fi:'', canvi:18500 }),
+  asseguranca: () => [
+    {id:uid(), nom:'IATI Seguros', link:'https://www.iatiseguros.com'},
+    {id:uid(), nom:'Heymondo', link:'https://www.heymondo.es'},
+    {id:uid(), nom:'Chapka', link:'https://www.chapkadirect.es'},
+    {id:uid(), nom:'InterMundial', link:'https://www.intermundial.es'},
+  ],
+  checklist: () => {
+    const p = (cat, text, link='') => ({id:uid(), cat, text, link, per:'persona', done:{}});
+    const g = (cat, text, link='') => ({id:uid(), cat, text, link, per:'grup', done:{}});
+    return [
+      p('Documentació','Passaport vàlid com a mínim 6 mesos des del dia que marxeu d\'Indonèsia'),
+      p('Documentació','e-VOA (visat) · 500.000 IDR · vàlid 30 dies','https://evisa.imigrasi.go.id'),
+      p('Documentació','All Indonesia Arrival Card (gratuïta, dins les 72 h abans d\'arribar)','https://allindonesia.imigrasi.go.id'),
+      p('Documentació','Taxa turística de Bali · 150.000 IDR','https://lovebali.baliprov.go.id'),
+      p('Documentació','Assegurança contractada i pòlissa descarregada al mòbil'),
+      p('Documentació','Carnet de conduir internacional (si llogueu moto)'),
+      p('Documentació','Còpies digitals de tot (passaport, visat, assegurança, QR)'),
+      p('Documentació','Targeta sense comissions + una mica d\'efectiu'),
+      g('Reserves','Vols d\'anada i tornada'),
+      g('Reserves','Allotjament a Ubud'),
+      g('Reserves','Allotjament a Uluwatu'),
+      g('Reserves','Allotjament a Canggu'),
+      g('Reserves','Allotjament a Gili T'),
+      g('Reserves','Trasllat aeroport → primer allotjament'),
+      g('Reserves','Fast boat a Gili T (anada i tornada)'),
+      g('Reserves','Entrades per a la dansa Kecak a Uluwatu'),
+      p('Maleta','eSIM o targeta SIM local'),
+      p('Maleta','Protector solar i repel·lent de mosquits'),
+      p('Maleta','Sarong o roba que tapi espatlles i genolls (temples)'),
+      p('Maleta','Farmaciola bàsica'),
+      p('Maleta','Endolls: tipus C/F com a Espanya, no cal adaptador 🙌'),
+    ];
+  },
+  recos: () => {
+    const r = (zona, cat, nom, nota) => ({id:uid(), zona, cat, nom, nota, link:'', fet:false});
+    return [
+      r('Ubud','Visitar','Tegallalang Rice Terrace','Les terrasses d\'arròs icòniques. Aneu-hi d\'hora (abans de les 8 h) per evitar gent i calor.'),
+      r('Ubud','Visitar','Campuhan Ridge Walk','Passeig fàcil per una carena verda. Perfecte a primera hora o a la posta.'),
+      r('Ubud','Visitar','Sacred Monkey Forest Sanctuary','Temples dins la selva plens de micos. Res de menjar ni ulleres a la vista 🐒'),
+      r('Ubud','Visitar','Tirta Empul','Temple d\'aigua sagrada on es fa el ritual de purificació. Cal sarong.'),
+      r('Ubud','Visitar','Tukad Cepung Waterfall','Cascada dins una cova amb raigs de llum. Millor entre les 9 i les 11 h.'),
+      r('Ubud','Experiència','Mount Batur Sunrise Trek','Sortida de matinada per veure sortir el sol des del volcà. Dur, però brutal.'),
+      r('Ubud','Experiència','The Yoga Barn','Classes de ioga i sound healing per desconnectar.'),
+      r('Ubud','Menjar','Sayuri Healing Food','Plant-based, bowls i postres raw.'),
+      r('Ubud','Compres','Ubud Art Market','Sarongs, cistells i bosses de ratan. Regategeu sempre!'),
+      r('Uluwatu','Visitar','Uluwatu Temple + dansa Kecak','Temple sobre el penya-segat. La Kecak a la posta és imprescindible.'),
+      r('Uluwatu','Platja','Melasti Beach','Aigua turquesa entre penya-segats blancs.'),
+      r('Uluwatu','Platja','Padang Padang Beach','Petita i preciosa, s\'hi accedeix per una escletxa entre roques.'),
+      r('Uluwatu','Platja','Bingin Beach','Escales, warungs penjats a la roca i ambient surfer.'),
+      r('Uluwatu','Festa','Single Fin','Posta de sol amb vistes a les onades. Els diumenges s\'anima molt.'),
+      r('Uluwatu','Platja','Sundays Beach Club','Beach club amb ascensor inclinat fins a la sorra.'),
+      r('Canggu','Visitar','Tanah Lot','Temple sobre una roca enmig del mar. Ideal a la posta.'),
+      r('Canggu','Platja','Batu Bolong Beach','Surf per a principiants i pufs per veure la posta.'),
+      r('Canggu','Platja','Echo Beach','Onades fortes i bon peix a la brasa al vespre.'),
+      r('Canggu','Festa','La Brisa','Bar de platja fet amb fusta reciclada. Rotllo boho total.'),
+      r('Canggu','Festa','Finns Beach Club','El beach club gran de Berawa, amb piscines i DJ.'),
+      r('Canggu','Menjar','Crate Café','Esmorzars mítics i ambient de nòmades digitals.'),
+      r('Gili T','Experiència','Snorkel amb tortugues','Tour de les tres Gili en barca: tortugues i estàtues submarines de Gili Meno.'),
+      r('Gili T','Visitar','Gronxadors a la posta','A la costa oest, dins l\'aigua. Arribeu-hi una mica abans per agafar lloc.'),
+      r('Gili T','Experiència','Volta a l\'illa en bici','No hi ha cotxes ni motos: tot en bici o a peu. La volta és d\'1 h aprox.'),
+      r('Gili T','Menjar','Night Market','Peix a la brasa i menjar local barat, al costat del port.'),
+      r('Gili T','Festa','Sama Sama Reggae Bar','Música en directe cada nit.'),
+      r('Altres','Excursió','Nusa Penida · Kelingking Beach','Excursió d\'un dia en barca des de Sanur. La famosa platja del T-Rex.'),
+      r('Seminyak','Festa','Potato Head Beach Club','Disseny, piscina infinita i posta de sol amb música.'),
+    ];
+  },
+};
+
+/* =========================================================
+   STORAGE + SYNC
+   ========================================================= */
+let S = {};
+let mode = 'local';
+
+function applyOp(cur, op){
+  if(op.op === 'set') return op.value;
+  const arr = Array.isArray(cur) ? cur.slice() : [];
+  if(op.op === 'upsert'){ const i = arr.findIndex(x => x.id === op.item.id); if(i >= 0) arr[i] = op.item; else arr.push(op.item); return arr; }
+  if(op.op === 'delete') return arr.filter(x => x.id !== op.id);
+  return cur;
+}
+function saveLocal(){ try{ localStorage.setItem(LS, JSON.stringify(S)); }catch(e){} }
+function loadLocal(){ try{ return JSON.parse(localStorage.getItem(LS)) || {}; }catch(e){ return {}; } }
+function setSync(state){
+  const el = document.getElementById('sync');
+  el.classList.toggle('err', state === 'err');
+  el.innerHTML = state === 'err' ? '⚠️<span class="st"> Error de connexió</span>' : mode === 'cloud' ? '☁️<span class="st"> Compartit</span>' : '💾<span class="st"> Només aquest dispositiu</span>';
+  el.title = mode === 'cloud' ? 'Els canvis es guarden per a les tres' : 'Mode local: els canvis només es guarden en aquest navegador';
+}
+async function post(key, op){
+  const r = await fetch(API, {method:'POST', headers:{'content-type':'application/json'}, body: JSON.stringify({key, ...op})});
+  if(!r.ok) throw new Error('save');
+  return r.json();
+}
+async function commit(key, op){
+  S[key] = applyOp(S[key], op); saveLocal(); render(key);
+  if(mode === 'cloud'){
+    try{ S[key] = await post(key, op); saveLocal(); render(key); setSync('ok'); }
+    catch(e){ setSync('err'); }
+  }
+}
+async function fetchRemote(){
+  const r = await fetch(API, {cache:'no-store'});
+  if(!r.ok || !(r.headers.get('content-type')||'').includes('json')) throw new Error('no api');
+  return r.json();
+}
+async function load(){
+  S = loadLocal();
+  try{
+    const remote = await fetchRemote();
+    mode = 'cloud';
+    for(const k of KEYS){
+      if(remote[k] != null) S[k] = remote[k];
+      else { S[k] = S[k] ?? DEFAULTS[k](); try{ S[k] = await post(k, {op:'set', value:S[k]}); }catch(e){} }
+    }
+  }catch(e){
+    mode = 'local';
+    for(const k of KEYS) if(S[k] == null) S[k] = DEFAULTS[k]();
+  }
+  saveLocal(); renderAll(); setSync('ok');
+}
+// refresca cada 30 s i quan tornes a la pestanya (si ningú està editant)
+async function refresh(){
+  if(mode !== 'cloud' || document.getElementById('modal').classList.contains('open')) return;
+  try{ const remote = await fetchRemote(); for(const k of KEYS) if(remote[k] != null) S[k] = remote[k]; saveLocal(); renderAll(); setSync('ok'); }catch(e){ setSync('err'); }
+}
+setInterval(refresh, 30000);
+document.addEventListener('visibilitychange', () => { if(!document.hidden) refresh(); });
+
+/* =========================================================
+   MODAL FORM
+   ========================================================= */
+let onSave = null;
+function openForm(title, fields, item, cb){
+  document.getElementById('mTitle').textContent = title;
+  const f = document.getElementById('mForm');
+  f.innerHTML = fields.map(fd => {
+    const v = item[fd.k] ?? fd.def ?? '';
+    const cls = fd.full ? 'full' : '';
+    if(fd.type === 'select') return `<label class="${cls}">${fd.label}<select name="${fd.k}">${fd.opts.map(o => `<option ${o==v?'selected':''}>${esc(o)}</option>`).join('')}</select></label>`;
+    if(fd.type === 'textarea') return `<label class="${cls}">${fd.label}<textarea name="${fd.k}" placeholder="${esc(fd.ph||'')}">${esc(v)}</textarea></label>`;
+    if(fd.type === 'people'){ const sel = Array.isArray(v) && v.length ? v : PEOPLE; return `<label class="full">${fd.label}<div class="ppl">${PEOPLE.map(p => `<label><input type="checkbox" name="${fd.k}" value="${p}" ${sel.includes(p)?'checked':''}> ${p}</label>`).join('')}</div></label>`; }
+    return `<label class="${cls}">${fd.label}<input name="${fd.k}" type="${fd.type||'text'}" ${fd.type==='number'?'step="any"':''} value="${esc(v)}" placeholder="${esc(fd.ph||'')}"></label>`;
+  }).join('');
+  onSave = () => {
+    const out = {...item};
+    for(const fd of fields){
+      if(fd.type === 'people') out[fd.k] = [...f.querySelectorAll(`input[name="${fd.k}"]:checked`)].map(i => i.value);
+      else { const el = f.elements[fd.k]; out[fd.k] = fd.type === 'number' ? (el.value === '' ? '' : parseFloat(el.value)) : el.value.trim(); }
+    }
+    if(!out.id) out.id = uid();
+    cb(out); closeModal();
+  };
+  document.getElementById('modal').classList.add('open');
+  setTimeout(() => f.querySelector('input,select,textarea')?.focus(), 50);
+}
+function closeModal(){ document.getElementById('modal').classList.remove('open'); }
+document.getElementById('mSave').onclick = () => onSave && onSave();
+document.getElementById('mForm').onsubmit = e => { e.preventDefault(); onSave && onSave(); };
+document.getElementById('modal').onclick = e => { if(e.target.id === 'modal') closeModal(); };
+document.addEventListener('keydown', e => { if(e.key === 'Escape') closeModal(); });
+function del(key, id, what){ if(confirm(`Segur que vols esborrar ${what}?`)) commit(key, {op:'delete', id}); }
+const find = (key, id) => (S[key]||[]).find(x => x.id === id) || {};
+
+/* =========================================================
+   LOGO
+   ========================================================= */
+function head(cx, o){
+  const y = 70;
+  let back = '', front = '';
+  if(o.curly){
+    const pts = [[-20,50],[-26,62],[-28,76],[-27,90],[-24,104],[-16,112],[20,50],[26,62],[28,76],[27,90],[24,104],[16,112],[-10,44],[0,42],[10,44],[-22,98],[22,98]];
+    back = pts.map(([dx,dy]) => `<circle cx="${cx+dx}" cy="${dy}" r="9" fill="${o.hair}"/>`).join('');
+    front = [[-12,53],[-4,50],[5,50],[13,53]].map(([dx,dy]) => `<circle cx="${cx+dx}" cy="${dy}" r="6" fill="${o.hair}"/>`).join('');
+  } else {
+    back = `<path d="M${cx-21},72 Q${cx-23},45 ${cx},45 Q${cx+23},45 ${cx+21},72 L${cx+23},${o.len} Q${cx},${o.len+6} ${cx-23},${o.len} Z" fill="${o.hair}"/>`;
+    front = `<path d="M${cx-18},70 Q${cx-19},50 ${cx},49 Q${cx+19},50 ${cx+18},70 Q${cx+15},57 ${cx+1},53 L${cx-1},53 Q${cx-15},57 ${cx-18},70 Z" fill="${o.hair}"/>`;
+  }
+  return `<g class="hd ${o.cls}">
+    ${back}
+    <path d="M${cx-27},142 Q${cx-27},101 ${cx-8},97 L${cx+8},97 Q${cx+27},101 ${cx+27},142 Z" fill="${o.top}"/>
+    <rect x="${cx-5}" y="86" width="10" height="13" rx="4" fill="${o.skin}"/>
+    <ellipse cx="${cx}" cy="${y}" rx="17" ry="20" fill="${o.skin}"/>
+    ${front}
+    <g transform="rotate(${o.tilt} ${cx} 49)"><ellipse cx="${cx-7}" cy="49" rx="6.5" ry="4.2" fill="#2b2420"/><ellipse cx="${cx+7}" cy="49" rx="6.5" ry="4.2" fill="#2b2420"/><path d="M${cx-1},48 L${cx+1},48" stroke="#2b2420" stroke-width="2"/></g>
+    <path d="M${cx-9},65 q3,-2 6,0 M${cx+3},65 q3,-2 6,0" stroke="#5a3a28" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+    <ellipse class="blink" cx="${cx-6}" cy="71" rx="1.9" ry="2.5" fill="#2b2420"/>
+    <ellipse class="blink" cx="${cx+6}" cy="71" rx="1.9" ry="2.5" fill="#2b2420"/>
+    <circle cx="${cx-10}" cy="78" r="3.4" fill="#ef8a6b" opacity=".35"/><circle cx="${cx+10}" cy="78" r="3.4" fill="#ef8a6b" opacity=".35"/>
+    <path d="M${cx-6},80 Q${cx},86 ${cx+6},80" stroke="#8a3c2c" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+    ${o.hoops ? `<circle cx="${cx-17}" cy="80" r="2.6" fill="none" stroke="#d9a93a" stroke-width="1.2"/><circle cx="${cx+17}" cy="80" r="2.6" fill="none" stroke="#d9a93a" stroke-width="1.2"/>` : ''}
+  </g>`;
+}
+let logoN = 0;
+function logoSVG(){
+  const id = 'lc' + (++logoN);
+  return `<svg class="logo" viewBox="0 0 220 142" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Logo Jana, Júlia i Laura">
+    <defs><clipPath id="${id}"><rect x="0" y="0" width="220" height="142" rx="70"/></clipPath></defs>
+    <g clip-path="url(#${id})">
+      <rect width="220" height="142" fill="#bfe5c8"/>
+      <g class="sun"><circle cx="186" cy="30" r="13" fill="#ffd36e"/><g stroke="#ffd36e" stroke-width="3" stroke-linecap="round"><path d="M186 8v-4M186 52v4M164 30h-4M208 30h4M171 15l-3-3M201 45l3 3M201 15l3-3M171 45l-3 3"/></g></g>
+      <g class="leafL"><path d="M38 108 C 20 70 0 60 -14 58 C 6 52 30 66 44 100 Z" fill="#1d7a50"/><path d="M40 104 C 30 76 18 40 -4 22 C 22 34 40 66 46 100 Z" fill="#46a876"/></g>
+      <g class="leafR"><path d="M182 108 C 200 70 220 60 234 58 C 214 52 190 66 176 100 Z" fill="#1d7a50"/><path d="M180 104 C 190 76 202 44 224 26 C 198 38 180 66 174 100 Z" fill="#46a876"/></g>
+      <path class="wv" d="M-10 128 Q 20 120 50 128 T 110 128 T 170 128 T 240 128 V150 H-10Z" fill="#37b8a6" opacity=".55"/>
+      ${head(58,  {hair:'#33201a', curly:true, skin:'#f2cdb2', top:'#fffef9', tilt:-6, hoops:true, cls:'d1'})}
+      ${head(162, {hair:'#8a6243', len:120, skin:'#f6d6c2', top:'#a9c79c', tilt:5, hoops:false, cls:'d3'})}
+      ${head(110, {hair:'#6a4630', len:114, skin:'#f4d0b8', top:'#efe4cf', tilt:0, hoops:true, cls:'d2'})}
+    </g>
+  </svg>`;
+}
+document.getElementById('logoBig').innerHTML = logoSVG().replace('class="logo"','class="logo logo-big"');
+document.getElementById('logoSmall').innerHTML = logoSVG();
+
+/* =========================================================
+   HERO: dates + compte enrere
+   ========================================================= */
+function tripStart(){
+  if(S.config?.inici) return new Date(S.config.inici + 'T00:00:00');
+  const anada = (S.vols||[]).filter(v => v.tipus === 'Anada' && v.data).sort((a,b) => a.data.localeCompare(b.data))[0];
+  return anada ? new Date(anada.data + 'T' + (anada.hSortida || '00:00')) : null;
+}
+function renderHero(){
+  const c = S.config || {};
+  const di = document.getElementById('dIni'), df = document.getElementById('dFi');
+  if(document.activeElement !== di) di.value = c.inici || '';
+  if(document.activeElement !== df) df.value = c.fi || '';
+  tickCount();
+}
+function tickCount(){
+  const el = document.getElementById('count');
+  const start = tripStart();
+  if(!start){ el.innerHTML = `<div class="box"><div class="n">🌴</div><div class="l">Poseu les dates</div></div>`; return; }
+  let ms = start - new Date();
+  if(ms <= 0){
+    const fi = S.config?.fi ? new Date(S.config.fi + 'T23:59:59') : null;
+    el.innerHTML = (fi && new Date() > fi)
+      ? `<div class="box"><div class="n">💚</div><div class="l">Quin viatge!</div></div>`
+      : `<div class="box"><div class="n">🌺</div><div class="l">Ja sou a Bali!</div></div>`;
+    return;
+  }
+  const d = Math.floor(ms/864e5); ms -= d*864e5; const h = Math.floor(ms/36e5); ms -= h*36e5; const m = Math.floor(ms/6e4); const s = Math.floor((ms - m*6e4)/1000);
+  el.innerHTML = [[d,'dies'],[h,'hores'],[m,'minuts'],[s,'segons']].map(([n,l]) => `<div class="box"><div class="n">${n}</div><div class="l">${l}</div></div>`).join('');
+}
+['dIni','dFi'].forEach(id => document.getElementById(id).addEventListener('change', () => {
+  commit('config', {op:'set', value:{...S.config, inici:document.getElementById('dIni').value, fi:document.getElementById('dFi').value}});
+}));
+setInterval(tickCount, 1000);
+
+/* =========================================================
+   MAPA
+   ========================================================= */
+const POINTS = [
+  {nom:'Aeroport de Denpasar (DPS)', e:'✈️', ll:[-8.7482,115.1670], d:'Aeroport Internacional Ngurah Rai. Al sud, a 15-30 min de Canggu/Uluwatu si no hi ha trànsit (i sempre n\'hi ha).'},
+  {nom:'Ubud', e:'🌿', ll:[-8.5069,115.2625], d:'El cor verd i espiritual: arrossars, selva, temples, ioga i cascades.'},
+  {nom:'Uluwatu', e:'🌊', ll:[-8.8149,115.0880], d:'Penya-segats, platges amagades, surf i les millors postes de sol.'},
+  {nom:'Canggu', e:'🏄‍♀️', ll:[-8.6478,115.1385], d:'Surf, cafès bonics, beach clubs i ambient jove.'},
+  {nom:'Gili Trawangan', e:'🐢', ll:[-8.3510,116.0390], d:'Illa sense cotxes: snorkel amb tortugues, bicis i festa. S\'hi va en fast boat (2-3 h).'},
+  {nom:'Port de Sanur', e:'⛴️', ll:[-8.6765,115.2630], d:'D\'aquí surten molts fast boats cap a Gili T i Nusa Penida.', small:true},
+  {nom:'Port de Padang Bai', e:'⛴️', ll:[-8.5300,115.5090], d:'Port alternatiu per anar a Gili T, més a l\'est.', small:true},
+];
+let map, markers = [];
+function initMap(){
+  map = L.map('map', {scrollWheelZoom:false}).setView([-8.55,115.55], 9);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+    attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>', maxZoom:18
+  }).addTo(map);
+  POINTS.forEach((p,i) => {
+    const icon = L.divIcon({className:'', html:`<div class="pin ${p.small?'small':''}"><span>${p.e}</span></div>`, iconSize:p.small?[24,24]:[34,34], iconAnchor:p.small?[12,24]:[17,34], popupAnchor:[0,-30]});
+    markers[i] = L.marker(p.ll, {icon}).addTo(map).bindPopup(`<b>${p.e} ${p.nom}</b><br>${p.d}<br><a href="${gmaps(p.nom+' Bali Indonesia')}" target="_blank" rel="noopener">Obrir a Google Maps ↗</a>`);
+  });
+  const g = L.featureGroup(markers); map.fitBounds(g.getBounds(), {padding:[30,30]});
+  document.getElementById('places').innerHTML = POINTS.map((p,i) => `<div class="place" onclick="goPlace(${i})"><b>${p.e} ${p.nom}</b><small>${p.d}</small></div>`).join('');
+}
+function goPlace(i){ map.flyTo(POINTS[i].ll, 12, {duration:1.2}); markers[i].openPopup(); }
+
+/* =========================================================
+   RELLOTGES
+   ========================================================= */
+function clockFace(svgId){
+  let ticks = '';
+  for(let i=0;i<12;i++){ const a = i*30*Math.PI/180; ticks += `<line x1="${50+40*Math.sin(a)}" y1="${50-40*Math.cos(a)}" x2="${50+44*Math.sin(a)}" y2="${50-44*Math.cos(a)}" stroke="#46a876" stroke-width="${i%3?1.5:3}" stroke-linecap="round"/>`; }
+  document.getElementById(svgId).innerHTML = `<circle cx="50" cy="50" r="47" fill="#fffef9" stroke="#1d7a50" stroke-width="3"/>${ticks}
+    <line class="hh" x1="50" y1="50" x2="50" y2="28" stroke="#0c3528" stroke-width="4" stroke-linecap="round"/>
+    <line class="mm" x1="50" y1="50" x2="50" y2="16" stroke="#1d7a50" stroke-width="3" stroke-linecap="round"/>
+    <line class="ss" x1="50" y1="56" x2="50" y2="12" stroke="#ef8a6b" stroke-width="1.3" stroke-linecap="round"/>
+    <circle cx="50" cy="50" r="3.5" fill="#0c3528"/>`;
+}
+function partsIn(tz, d){
+  const f = new Intl.DateTimeFormat('en-GB', {timeZone:tz, hour12:false, year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', second:'2-digit'});
+  const o = {}; f.formatToParts(d).forEach(p => o[p.type] = p.value);
+  return {y:+o.year, mo:+o.month, d:+o.day, h:+o.hour % 24, m:+o.minute, s:+o.second};
+}
+function setHands(svgId, p){
+  const svg = document.getElementById(svgId);
+  svg.querySelector('.hh').setAttribute('transform', `rotate(${(p.h%12)*30 + p.m*0.5} 50 50)`);
+  svg.querySelector('.mm').setAttribute('transform', `rotate(${p.m*6 + p.s*0.1} 50 50)`);
+  svg.querySelector('.ss').setAttribute('transform', `rotate(${p.s*6} 50 50)`);
+}
+const dayFmt = tz => new Intl.DateTimeFormat('ca-ES', {timeZone:tz, weekday:'long', day:'numeric', month:'long'});
+const pad = n => String(n).padStart(2,'0');
+function tickClocks(){
+  const now = new Date();
+  const b = partsIn('Asia/Makassar', now), c = partsIn('Europe/Madrid', now);
+  setHands('clkBali', b); setHands('clkBcn', c);
+  document.getElementById('digBali').textContent = `${pad(b.h)}:${pad(b.m)}`;
+  document.getElementById('digBcn').textContent = `${pad(c.h)}:${pad(c.m)}`;
+  document.getElementById('dayBali').textContent = dayFmt('Asia/Makassar').format(now);
+  document.getElementById('dayBcn').textContent = dayFmt('Europe/Madrid').format(now);
+  const diff = Math.round((Date.UTC(b.y,b.mo-1,b.d,b.h,b.m) - Date.UTC(c.y,c.mo-1,c.d,c.h,c.m)) / 36e5);
+  document.getElementById('diffH').textContent = `+${diff} h`;
+  document.getElementById('diffTxt').textContent = `Bali va ${diff} hores per davant (+7 a l'hivern, +6 a l'estiu: Bali no canvia mai l'hora)`;
+  const awake = h => h >= 9 && h < 23;
+  document.getElementById('callok').innerHTML = awake(b.h) && awake(c.h) ? '✅ Bon moment per trucar a casa' : !awake(c.h) ? '😴 A Barcelona dormen' : '😴 A Bali és hora de dormir';
+}
+clockFace('clkBali'); clockFace('clkBcn'); tickClocks(); setInterval(tickClocks, 1000);
+
+/* =========================================================
+   VOLS
+   ========================================================= */
+const VOL_FIELDS = [
+  {k:'tipus', label:'Tipus', type:'select', opts:['Anada','Tornada','Intern']},
+  {k:'companyia', label:'Companyia', ph:'Qatar Airways'},
+  {k:'num', label:'Núm. de vol', ph:'QR 146'},
+  {k:'localitzador', label:'Localitzador', ph:'ABC123'},
+  {k:'origen', label:'Origen (codi)', ph:'BCN'},
+  {k:'desti', label:'Destinació (codi)', ph:'DPS'},
+  {k:'data', label:'Data de sortida', type:'date'},
+  {k:'hSortida', label:'Hora sortida (local)', type:'time'},
+  {k:'dataArr', label:'Data d\'arribada', type:'date'},
+  {k:'hArribada', label:'Hora arribada (local)', type:'time'},
+  {k:'escala', label:'Escala', ph:'Doha · 2h 30min', full:true},
+  {k:'link', label:'Enllaç a la reserva', type:'url', full:true},
+  {k:'notes', label:'Notes (maletes, seients…)', type:'textarea', full:true},
+];
+function editVol(id){ const it = id ? find('vols', id) : {}; openForm(id ? 'Editar vol' : 'Nou vol ✈️', VOL_FIELDS, it, x => commit('vols', {op:'upsert', item:x})); }
+const fmtDate = d => d ? new Date(d+'T12:00:00').toLocaleDateString('ca-ES', {weekday:'short', day:'numeric', month:'short'}) : '';
+function renderVols(){
+  const list = (S.vols||[]).slice().sort((a,b) => (a.data||'9').localeCompare(b.data||'9') || (a.hSortida||'').localeCompare(b.hSortida||''));
+  const el = document.getElementById('volsList');
+  if(!list.length){ el.innerHTML = `<div class="empty">Encara no hi ha vols. Afegiu el d'anada i el de tornada (i els interns si n'hi ha) ✈️</div>`; return; }
+  el.innerHTML = list.map(v => `<div class="flight">
+    <div class="tag ${esc((v.tipus||'').toLowerCase())}">${esc(v.tipus||'Vol')}</div>
+    <div>
+      <div class="route">
+        <div><div class="ap">${esc(v.origen||'—')}</div><div class="t">${fmtDate(v.data)} · ${esc(v.hSortida||'')}</div></div>
+        <div class="line"></div>
+        <div style="text-align:right"><div class="ap">${esc(v.desti||'—')}</div><div class="t">${fmtDate(v.dataArr||v.data)} · ${esc(v.hArribada||'')}</div></div>
+      </div>
+      <div class="fmeta">
+        ${v.companyia?`<span>🛫 <b>${esc(v.companyia)}</b> ${esc(v.num||'')}</span>`:''}
+        ${v.localitzador?`<span>🔖 Localitzador: <b>${esc(v.localitzador)}</b></span>`:''}
+        ${v.escala?`<span>⏱️ ${esc(v.escala)}</span>`:''}
+        ${v.link?`<a href="${esc(safeUrl(v.link))}" target="_blank" rel="noopener">Veure reserva ↗</a>`:''}
+      </div>
+      ${v.notes?`<div class="fmeta">📝 ${esc(v.notes)}</div>`:''}
+    </div>
+    <div><button class="ico" title="Editar" onclick="editVol('${v.id}')">✏️</button><button class="ico" title="Esborrar" onclick="del('vols','${v.id}','aquest vol')">🗑️</button></div>
+  </div>`).join('');
+}
+
+/* =========================================================
+   ALLOTJAMENT
+   ========================================================= */
+let stayZone = 'Totes';
+const STAY_FIELDS = [
+  {k:'nom', label:'Nom', ph:'Villa Bambú', full:true},
+  {k:'zona', label:'Zona', type:'select', opts:ZONES},
+  {k:'estat', label:'Estat', type:'select', opts:['Opció','Reservat','Descartat']},
+  {k:'link', label:'Enllaç (Booking, Airbnb…)', type:'url', full:true},
+  {k:'preuNit', label:'Preu per nit (€, total habitació)', type:'number'},
+  {k:'nits', label:'Nits', type:'number'},
+  {k:'checkin', label:'Check-in', type:'date'},
+  {k:'checkout', label:'Check-out', type:'date'},
+  {k:'valoracio', label:'Valoració', type:'select', opts:['','1','2','3','4','5']},
+  {k:'piscina', label:'Piscina?', type:'select', opts:['','Sí','No']},
+  {k:'pros', label:'👍 Pros', type:'textarea'},
+  {k:'contres', label:'👎 Contres', type:'textarea'},
+  {k:'notes', label:'Notes', type:'textarea', full:true},
+];
+function editStay(id){ const it = id ? find('allotjament', id) : {zona: stayZone !== 'Totes' ? stayZone : 'Ubud', estat:'Opció'}; openForm(id ? 'Editar allotjament' : 'Nou allotjament 🏡', STAY_FIELDS, it, x => commit('allotjament', {op:'upsert', item:x})); }
+function setStayZone(z){ stayZone = z; renderStay(); }
+function renderStay(){
+  const all = S.allotjament||[];
+  document.getElementById('stayChips').innerHTML = ['Totes', ...ZONES].map(z => {
+    const n = z === 'Totes' ? all.length : all.filter(s => s.zona === z).length;
+    return `<button class="chip ${stayZone===z?'on':''}" onclick="setStayZone('${z}')">${ZONE_EMOJI[z]||'🌍'} ${z} ${n?`(${n})`:''}</button>`;
+  }).join('');
+  const el = document.getElementById('stayList');
+  if(!all.length){ el.innerHTML = `<div class="empty">Afegiu les opcions que aneu trobant i aquí es compararan per zona 🏝️</div>`; return; }
+  const zones = (stayZone === 'Totes' ? ZONES : [stayZone]).filter(z => all.some(s => s.zona === z));
+  if(!zones.length){ el.innerHTML = `<div class="empty">Encara no hi ha res a ${esc(stayZone)}.</div>`; return; }
+  el.innerHTML = zones.map(z => {
+    const items = all.filter(s => s.zona === z).sort((a,b) => (a.estat==='Descartat') - (b.estat==='Descartat') || (+a.preuNit||1e9) - (+b.preuNit||1e9));
+    const live = items.filter(s => s.estat !== 'Descartat' && +s.preuNit > 0);
+    const cheapest = live.length > 1 ? live.reduce((m,s) => +s.preuNit < +m.preuNit ? s : m) : null;
+    return `<div class="zone"><h3>${ZONE_EMOJI[z]} ${z}</h3><div class="grid g2">${items.map(s => {
+      const nits = +s.nits || (s.checkin && s.checkout ? Math.round((new Date(s.checkout) - new Date(s.checkin))/864e5) : 0);
+      const tot = (+s.preuNit||0) * nits;
+      const st = s.estat === 'Reservat' ? 'res' : s.estat === 'Descartat' ? 'desc' : '';
+      return `<div class="stay ${st}">
+        <div class="acts"><button class="ico" onclick="editStay('${s.id}')">✏️</button><button class="ico" onclick="del('allotjament','${s.id}','aquest allotjament')">🗑️</button></div>
+        <h4>${esc(s.nom||'Sense nom')}</h4>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <span class="pill ${s.estat==='Reservat'?'ok':s.estat==='Descartat'?'no':''}">${s.estat==='Reservat'?'✅ ':''}${esc(s.estat||'Opció')}</span>
+          ${cheapest && cheapest.id===s.id ? '<span class="pill lime">💚 La més barata</span>' : ''}
+          ${s.piscina==='Sí' ? '<span class="pill">🏊‍♀️ Piscina</span>' : ''}
+          ${s.valoracio ? `<span class="stars">${'★'.repeat(+s.valoracio)}${'☆'.repeat(5-+s.valoracio)}</span>` : ''}
+        </div>
+        <div class="prices">
+          <div><b>${s.preuNit?eur(+s.preuNit):'—'}</b>per nit</div>
+          <div><b>${nits||'—'}</b>nits</div>
+          <div><b>${tot?eur(tot):'—'}</b>total</div>
+          <div><b>${tot?eur(tot/3):'—'}</b>per persona</div>
+        </div>
+        ${s.checkin?`<small style="color:var(--muted)">📅 ${fmtDate(s.checkin)} → ${fmtDate(s.checkout)}</small>`:''}
+        ${s.pros||s.contres?`<div class="pc">${s.pros?`<div class="p">👍 ${esc(s.pros)}</div>`:''}${s.contres?`<div class="c">👎 ${esc(s.contres)}</div>`:''}</div>`:''}
+        ${s.notes?`<small style="color:var(--muted)">📝 ${esc(s.notes)}</small>`:''}
+        ${s.link?`<a href="${esc(safeUrl(s.link))}" target="_blank" rel="noopener" style="font-weight:600;font-size:14px">Veure allotjament ↗</a>`:''}
+      </div>`;
+    }).join('')}</div></div>`;
+  }).join('');
+}
+
+/* =========================================================
+   ASSEGURANÇA
+   ========================================================= */
+const INS_FIELDS = [
+  {k:'nom', label:'Companyia / producte', full:true},
+  {k:'preu', label:'Preu per persona (€)', type:'number'},
+  {k:'medica', label:'Despeses mèdiques', ph:'Il·limitades / 1.000.000 €'},
+  {k:'cancel', label:'Cancel·lació', ph:'3.000 €'},
+  {k:'equipatge', label:'Equipatge', ph:'1.500 €'},
+  {k:'moto', label:'Moto / esports', ph:'Sí, amb carnet'},
+  {k:'franquicia', label:'Franquícia', ph:'Sense / 50 €'},
+  {k:'valoracio', label:'Valoració', type:'select', opts:['','1','2','3','4','5']},
+  {k:'link', label:'Enllaç', type:'url', full:true},
+  {k:'notes', label:'Notes', type:'textarea', full:true},
+];
+function editIns(id){ const it = id ? find('asseguranca', id) : {}; openForm(id ? 'Editar assegurança' : 'Nova opció 🛟', INS_FIELDS, it, x => commit('asseguranca', {op:'upsert', item:x})); }
+function chooseIns(id){
+  (S.asseguranca||[]).forEach(i => { const want = i.id === id ? !i.escollida : false; if(!!i.escollida !== want) commit('asseguranca', {op:'upsert', item:{...i, escollida:want}}); });
+}
+function renderIns(){
+  const list = (S.asseguranca||[]).slice().sort((a,b) => (b.escollida?1:0) - (a.escollida?1:0) || (+a.preu||1e9) - (+b.preu||1e9));
+  const priced = list.filter(i => +i.preu > 0);
+  const min = priced.length ? Math.min(...priced.map(i => +i.preu)) : null;
+  const cell = v => v ? esc(v) : '<span style="color:#b9c9be">—</span>';
+  document.getElementById('insBody').innerHTML = list.length ? list.map(i => `<tr class="${i.escollida?'chosen':''}">
+    <td><button class="ico" title="Marcar com a escollida" onclick="chooseIns('${i.id}')" style="opacity:${i.escollida?1:.35}">⭐</button></td>
+    <td><b>${esc(i.nom)}</b>${i.link?`<br><a href="${esc(safeUrl(i.link))}" target="_blank" rel="noopener" style="font-size:13px">web ↗</a>`:''}</td>
+    <td>${i.preu?`<b>${eur(+i.preu)}</b>${+i.preu===min && priced.length>1?' <span class="pill lime">💚</span>':''}`:cell()}</td>
+    <td>${cell(i.medica)}</td><td>${cell(i.cancel)}</td><td>${cell(i.equipatge)}</td><td>${cell(i.moto)}</td><td>${cell(i.franquicia)}</td>
+    <td>${i.valoracio?`<span class="stars">${'★'.repeat(+i.valoracio)}</span>`:cell()}</td>
+    <td style="max-width:200px">${cell(i.notes)}</td>
+    <td style="white-space:nowrap"><button class="ico" onclick="editIns('${i.id}')">✏️</button><button class="ico" onclick="del('asseguranca','${i.id}','aquesta opció')">🗑️</button></td>
+  </tr>`).join('') : `<tr><td colspan="11"><div class="empty">Afegiu opcions per comparar-les.</div></td></tr>`;
+}
+
+/* =========================================================
+   DESPESES
+   ========================================================= */
+const CATS = {'Allotjament':'🏡','Transport':'🛵','Menjar':'🍜','Activitats':'🌋','Festa':'🍹','Compres':'🛍️','Altres':'✨'};
+const EXP_FIELDS = [
+  {k:'concepte', label:'Concepte', ph:'Sopar a Jimbaran', full:true},
+  {k:'import', label:'Import', type:'number'},
+  {k:'moneda', label:'Moneda', type:'select', opts:['EUR','IDR']},
+  {k:'pagador', label:'Qui ha pagat', type:'select', opts:PEOPLE},
+  {k:'categoria', label:'Categoria', type:'select', opts:Object.keys(CATS)},
+  {k:'data', label:'Data', type:'date'},
+  {k:'entre', label:'Es divideix entre', type:'people'},
+];
+const rate = () => +(S.config?.canvi) || 18500;
+const toEur = e => e.moneda === 'IDR' ? (+e.import||0) / rate() : (+e.import||0);
+function editExp(id){ const it = id ? find('despeses', id) : {moneda:'EUR', pagador:PEOPLE[0], categoria:'Menjar', data:new Date().toISOString().slice(0,10), entre:PEOPLE.slice()}; openForm(id ? 'Editar despesa' : 'Nova despesa 💸', EXP_FIELDS, it, x => { if(!x.entre.length) x.entre = PEOPLE.slice(); commit('despeses', {op:'upsert', item:x}); }); }
+function renderExp(){
+  const list = (S.despeses||[]).slice().sort((a,b) => (b.data||'').localeCompare(a.data||''));
+  const el = document.getElementById('expList');
+  el.innerHTML = list.length ? list.map(e => `<div class="exp">
+    <div class="em">${CATS[e.categoria]||'✨'}</div>
+    <div><b>${esc(e.concepte||'Despesa')}</b><br><small>${esc(e.pagador)} ha pagat · ${(e.entre||PEOPLE).length===3?'entre les 3':'entre '+esc((e.entre||[]).join(' i '))}${e.data?' · '+fmtDate(e.data):''}</small></div>
+    <div class="amt">${eur(toEur(e))}${e.moneda==='IDR'?`<br><small>${idr(e.import)}</small>`:''}</div>
+    <div style="white-space:nowrap"><button class="ico" onclick="editExp('${e.id}')">✏️</button><button class="ico" onclick="del('despeses','${e.id}','aquesta despesa')">🗑️</button></div>
+  </div>`).join('') : `<div class="empty">Encara cap despesa. Quan algú pagui per totes, apunteu-ho aquí 💸</div>`;
+
+  const bal = Object.fromEntries(PEOPLE.map(p => [p, 0]));
+  let total = 0;
+  list.forEach(e => {
+    const a = toEur(e); total += a;
+    const who = (e.entre && e.entre.length) ? e.entre : PEOPLE;
+    if(bal[e.pagador] !== undefined) bal[e.pagador] += a;
+    who.forEach(p => { if(bal[p] !== undefined) bal[p] -= a / who.length; });
+  });
+  document.getElementById('expTotal').textContent = eur(total);
+  document.getElementById('expPP').textContent = total ? `≈ ${eur(total/3)} per persona` : '';
+  document.getElementById('balances').innerHTML = PEOPLE.map(p => {
+    const v = bal[p]; const cls = v > 0.005 ? 'pos' : v < -0.005 ? 'neg' : '';
+    return `<div class="bal"><span>${p}</span><span class="${cls}">${v > 0.005 ? '+' : ''}${eur(v)}</span></div>`;
+  }).join('');
+  // qui paga a qui (mínim de transferències)
+  const cred = PEOPLE.filter(p => bal[p] > 0.005).map(p => ({p, v:bal[p]})).sort((a,b) => b.v - a.v);
+  const debt = PEOPLE.filter(p => bal[p] < -0.005).map(p => ({p, v:-bal[p]})).sort((a,b) => b.v - a.v);
+  const tx = [];
+  let i = 0, j = 0;
+  while(i < debt.length && j < cred.length){
+    const x = Math.min(debt[i].v, cred[j].v);
+    tx.push(`💸 <b>${debt[i].p}</b> → <b>${cred[j].p}</b>: ${eur(x)}`);
+    debt[i].v -= x; cred[j].v -= x;
+    if(debt[i].v < 0.005) i++; if(cred[j].v < 0.005) j++;
+  }
+  document.getElementById('settle').innerHTML = tx.length ? tx.map(t => `<div class="settle">${t}</div>`).join('') : (total ? '<div class="settle">✨ Esteu en paus!</div>' : '');
+  const r = document.getElementById('rate'); if(document.activeElement !== r) r.value = rate();
+  convUpdate();
+}
+function convUpdate(){
+  const e = parseFloat(document.getElementById('cvEur').value), i = parseFloat(document.getElementById('cvIdr').value);
+  document.getElementById('cvIdrOut').textContent = isNaN(e) ? '—' : idr(e * rate());
+  document.getElementById('cvEurOut').textContent = isNaN(i) ? '—' : eur(i / rate());
+}
+document.getElementById('cvEur').addEventListener('input', convUpdate);
+document.getElementById('cvIdr').addEventListener('input', convUpdate);
+document.getElementById('rate').addEventListener('change', e => { const v = parseFloat(e.target.value); if(v > 0) commit('config', {op:'set', value:{...S.config, canvi:v}}); });
+
+/* =========================================================
+   CHECKLIST
+   ========================================================= */
+const CHECK_FIELDS = [
+  {k:'text', label:'Què cal fer', full:true},
+  {k:'cat', label:'Categoria', type:'select', opts:['Documentació','Reserves','Maleta','Altres']},
+  {k:'per', label:'Qui ho ha de marcar', type:'select', opts:['persona','grup']},
+  {k:'link', label:'Enllaç (opcional)', type:'url', full:true},
+];
+function editCheck(id){ const it = id ? find('checklist', id) : {cat:'Documentació', per:'persona', done:{}}; openForm(id ? 'Editar ítem' : 'Nou ítem ✅', CHECK_FIELDS, it, x => { x.done = x.done || {}; commit('checklist', {op:'upsert', item:x}); }); }
+function toggleCheck(id, who){
+  const it = find('checklist', id); const done = {...(it.done||{})}; done[who] = !done[who];
+  commit('checklist', {op:'upsert', item:{...it, done}});
+}
+const isDone = it => it.per === 'grup' ? !!it.done?.grup : PEOPLE.every(p => it.done?.[p]);
+function renderCheck(){
+  const list = S.checklist||[];
+  let tot = 0, ok = 0;
+  list.forEach(it => { if(it.per === 'grup'){ tot++; if(it.done?.grup) ok++; } else PEOPLE.forEach(p => { tot++; if(it.done?.[p]) ok++; }); });
+  const pct = tot ? Math.round(ok/tot*100) : 0;
+  const perP = PEOPLE.map(p => { const mine = list.filter(i => i.per !== 'grup'); const d = mine.filter(i => i.done?.[p]).length; return `${p} ${d}/${mine.length}`; }).join(' · ');
+  document.getElementById('checkProgress').innerHTML = `<div style="display:flex;justify-content:space-between;font-size:14px;color:var(--muted)"><span><b style="color:var(--jungle);font-size:20px">${pct}%</b> fet</span><span>${perP}</span></div><div class="progress"><div style="width:${pct}%"></div></div>`;
+  const cats = [...new Set(list.map(i => i.cat))];
+  const icons = {'Documentació':'🛂','Reserves':'📌','Maleta':'🎒','Altres':'✨'};
+  document.getElementById('checkList').innerHTML = cats.map(c => `<h3>${icons[c]||'✨'} ${esc(c)}</h3>` + list.filter(i => i.cat === c).map(it => `
+    <div class="ci ${isDone(it)?'done':''}">
+      <div class="txt">${esc(it.text)}${it.link?` <small><a href="${esc(safeUrl(it.link))}" target="_blank" rel="noopener">${esc(it.link.replace(/^https?:\/\//,''))} ↗</a></small>`:''}</div>
+      <div class="who">${it.per === 'grup'
+        ? `<button class="${it.done?.grup?'on':''}" onclick="toggleCheck('${it.id}','grup')">${it.done?.grup?'✓ Fet':'Pendent'}</button>`
+        : PEOPLE.map(p => `<button class="${it.done?.[p]?'on':''}" onclick="toggleCheck('${it.id}','${p}')">${it.done?.[p]?'✓ ':''}${p}</button>`).join('')}</div>
+      <div style="white-space:nowrap"><button class="ico" onclick="editCheck('${it.id}')">✏️</button><button class="ico" onclick="del('checklist','${it.id}','aquest ítem')">🗑️</button></div>
+    </div>`).join('')).join('');
+}
+
+/* =========================================================
+   RECOMANACIONS
+   ========================================================= */
+let recoZone = 'Totes', recoCat = 'Tot';
+const RECO_CATS = ['Visitar','Platja','Menjar','Festa','Experiència','Excursió','Compres'];
+const RECO_ICON = {'Visitar':'🛕','Platja':'🏖️','Menjar':'🍜','Festa':'🍹','Experiència':'🤿','Excursió':'🚤','Compres':'🛍️'};
+const RECO_FIELDS = [
+  {k:'nom', label:'Nom del lloc', full:true},
+  {k:'zona', label:'Zona', type:'select', opts:ZONES},
+  {k:'cat', label:'Tipus', type:'select', opts:RECO_CATS},
+  {k:'nota', label:'Per què val la pena', type:'textarea', full:true},
+  {k:'link', label:'Enllaç (opcional, si no es busca a Google Maps)', type:'url', full:true},
+];
+function editReco(id){ const it = id ? find('recos', id) : {zona: recoZone !== 'Totes' ? recoZone : 'Ubud', cat:'Visitar', fet:false}; openForm(id ? 'Editar lloc' : 'Nou lloc 🌺', RECO_FIELDS, it, x => commit('recos', {op:'upsert', item:x})); }
+function toggleReco(id){ const it = find('recos', id); commit('recos', {op:'upsert', item:{...it, fet:!it.fet}}); }
+function setRZ(z){ recoZone = z; renderRecos(); } function setRC(c){ recoCat = c; renderRecos(); }
+function renderRecos(){
+  const all = S.recos||[];
+  document.getElementById('recoZones').innerHTML = ['Totes', ...ZONES.filter(z => all.some(r => r.zona === z))].map(z => `<button class="chip ${recoZone===z?'on':''}" onclick="setRZ('${z}')">${ZONE_EMOJI[z]||'🌍'} ${z}</button>`).join('');
+  document.getElementById('recoCats').innerHTML = ['Tot', ...RECO_CATS.filter(c => all.some(r => r.cat === c))].map(c => `<button class="chip ${recoCat===c?'on':''}" onclick="setRC('${c}')">${RECO_ICON[c]||'✨'} ${c}</button>`).join('');
+  const list = all.filter(r => (recoZone === 'Totes' || r.zona === recoZone) && (recoCat === 'Tot' || r.cat === recoCat)).sort((a,b) => (a.fet?1:0) - (b.fet?1:0));
+  document.getElementById('recoList').innerHTML = list.length ? list.map(r => `<div class="reco ${r.fet?'fet':''}">
+    <div class="acts"><button class="ico" onclick="editReco('${r.id}')">✏️</button><button class="ico" onclick="del('recos','${r.id}','aquest lloc')">🗑️</button></div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap"><span class="pill">${ZONE_EMOJI[r.zona]||'📍'} ${esc(r.zona)}</span><span class="pill" style="background:var(--sand)">${RECO_ICON[r.cat]||'✨'} ${esc(r.cat)}</span></div>
+    <h4>${esc(r.nom)}</h4>
+    <p>${esc(r.nota)}</p>
+    <div class="foot">
+      <a href="${esc(r.link ? safeUrl(r.link) : gmaps(r.nom + ' ' + (r.zona==='Altres'?'':r.zona) + ' Bali'))}" target="_blank" rel="noopener">📍 Veure al mapa ↗</a>
+      <button class="btn sm ${r.fet?'':'ghost'}" onclick="toggleReco('${r.id}')">${r.fet?'✓ Fet!':'Marcar com a fet'}</button>
+    </div>
+  </div>`).join('') : `<div class="empty" style="grid-column:1/-1">Res per aquí. Afegiu-hi els vostres descobriments 🌺</div>`;
+}
+
+/* =========================================================
+   RENDER
+   ========================================================= */
+const RENDER = {vols:()=>{renderVols();renderHero();}, allotjament:renderStay, asseguranca:renderIns, despeses:renderExp, checklist:renderCheck, recos:renderRecos, config:()=>{renderHero();renderExp();}};
+function render(k){ RENDER[k] && RENDER[k](); }
+function renderAll(){ KEYS.forEach(render); }
+
+try{ initMap(); }catch(e){ document.getElementById('map').innerHTML = '<div class="empty" style="height:100%;display:grid;place-items:center">No s\'ha pogut carregar el mapa 🗺️</div>'; document.getElementById('places').innerHTML = POINTS.map(p => `<div class="place"><b>${p.e} ${p.nom}</b><small>${p.d}</small></div>`).join(''); }
+load();
+</script>
+</body>
+</html>
